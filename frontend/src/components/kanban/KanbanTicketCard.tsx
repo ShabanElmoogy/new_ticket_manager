@@ -124,15 +124,6 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
               </Typography>
             </Box>
             <Box display="flex" alignItems="center">
-              <TicketWhatsAppButton
-                ticket={ticket}
-                defaultRecipient="assignee"
-                size="small"
-                onSent={(result) =>
-                  console.log("WhatsApp message sent:", result)
-                }
-                onError={(error) => console.error("WhatsApp error:", error)}
-              />
               <IconButton
                 size="small"
                 onClick={handleMenuClick}
