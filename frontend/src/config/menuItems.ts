@@ -64,24 +64,6 @@ export const createMenuItems = ({
         onMobileMenuClose();
       },
     },
-    {
-      label: "WhatsApp Test",
-      icon: React.createElement(WhatsAppIcon),
-      onClick: () => {
-        if (onOpenWhatsApp) onOpenWhatsApp();
-        onClose();
-        onMobileMenuClose();
-      },
-    },
-    {
-      label: "WhatsApp Users",
-      icon: React.createElement(PeopleIcon),
-      onClick: () => {
-        if (onOpenWhatsAppUsers) onOpenWhatsAppUsers();
-        onClose();
-        onMobileMenuClose();
-      },
-    },
     ...(user?.role === "ADMIN" && onOpenAdminPanel
       ? [
           {

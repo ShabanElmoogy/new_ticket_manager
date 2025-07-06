@@ -105,8 +105,6 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
     mode,
     onOpenAdminPanel,
     onOpenKanban,
-    onOpenWhatsApp,
-    onOpenWhatsAppUsers,
     onToggleTheme: toggleTheme,
     onLogout: logout,
     onClose: handleClose,

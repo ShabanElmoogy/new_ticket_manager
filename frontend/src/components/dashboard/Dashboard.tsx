@@ -40,16 +40,19 @@ import MobileSearchOverlay from "../tickets/MobileSearchOverlay";
 import KanbanPage from "../kanban/KanbanPage";
 import ErrorBoundary from "../common/ErrorBoundary";
 import { io, Socket } from "socket.io-client";
-import WhatsAppTestPage from "../../pages/WhatsAppTestPage";
-import WhatsAppPage from "../../pages/WhatsAppPage";
 
-type ViewType = 'dashboard' | 'kanban' | 'admin' | 'whatsapp' | 'whatsapp-users';
+type ViewType =
+  | "dashboard"
+  | "kanban"
+  | "admin"
+  | "whatsapp"
+  | "whatsapp-users";
 
 const Dashboard: React.FC = () => {
   const { user, token } = useAuthStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("xl"));
-  const [currentView, setCurrentView] = useState<ViewType>('dashboard');
+  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
   const [stats, setStats] = useState<DashboardStats>({
     totalTickets: 0,
     openTickets: 0,
@@ -83,19 +86,19 @@ const Dashboard: React.FC = () => {
     try {
       // Get all boards
       const boards = await kanbanApi.getAllBoards();
-      
+
       // Look for a default board or the first available board
-      let defaultBoard = boards.find(board => board.isDefault) || boards[0];
-      
+      let defaultBoard = boards.find((board) => board.isDefault) || boards[0];
+
       // If no boards exist, create a default one
       if (!defaultBoard) {
         defaultBoard = await kanbanApi.createBoard({
           name: "Main Board",
           description: "Default board for all tickets",
-          isDefault: true
+          isDefault: true,
         });
       }
-      
+
       return defaultBoard;
     } catch (error) {
       console.error("Error getting/creating default board:", error);
@@ -288,7 +291,8 @@ const Dashboard: React.FC = () => {
     if (!user) return;
 
     // Initialize socket connection
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
+    const socketUrl =
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:3001";
     const newSocket = io(socketUrl);
     setSocket(newSocket);
 
@@ -359,9 +363,9 @@ const Dashboard: React.FC = () => {
       // Add the default board ID to the ticket data
       const ticketWithBoard = {
         ...ticketData,
-        boardId: defaultBoard?.id
+        boardId: defaultBoard?.id,
       };
-      
+
       await apiService.createTicket(token, ticketWithBoard);
       showSnackbar("Ticket posted successfully! 🎉", "success");
       fetchData();
@@ -444,19 +448,17 @@ const Dashboard: React.FC = () => {
   // Render different views based on currentView
   const renderCurrentView = () => {
     switch (currentView) {
-      case 'kanban':
+      case "kanban":
         return (
           <ErrorBoundary>
             <KanbanPage />
           </ErrorBoundary>
         );
-      case 'admin':
-        return <AdminPanel onBackToDashboard={() => setCurrentView('dashboard')} />;
-      case 'whatsapp':
-        return <WhatsAppTestPage />;
-      case 'whatsapp-users':
-        return <WhatsAppPage />;
-      case 'dashboard':
+      case "admin":
+        return (
+          <AdminPanel onBackToDashboard={() => setCurrentView("dashboard")} />
+        );
+      case "dashboard":
       default:
         return renderDashboardContent();
     }
@@ -464,7 +466,6 @@ const Dashboard: React.FC = () => {
 
   const renderDashboardContent = () => (
     <Box>
-
       <Box
         sx={{
           p: { xs: 1, sm: 2, md: 3 },
@@ -929,10 +930,10 @@ const Dashboard: React.FC = () => {
   return (
     <Box>
       <Header
-        onOpenAdminPanel={() => setCurrentView('admin')}
-        onOpenKanban={() => setCurrentView('kanban')}
-        onOpenWhatsApp={() => setCurrentView('whatsapp')}
-        onOpenWhatsAppUsers={() => setCurrentView('whatsapp-users')}
+        onOpenAdminPanel={() => setCurrentView("admin")}
+        onOpenKanban={() => setCurrentView("kanban")}
+        onOpenWhatsApp={() => setCurrentView("whatsapp")}
+        onOpenWhatsAppUsers={() => setCurrentView("whatsapp-users")}
         onTicketClick={handleTicketClick}
       />
       {renderCurrentView()}

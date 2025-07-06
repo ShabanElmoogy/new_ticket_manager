@@ -19,7 +19,6 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 import kanbanRoutes from "./routes/kanbanRoutes.js";
 import labelRoutes from "./routes/labelRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import whatsappRoutes from "./routes/whatsappRoutes.js";
 
 // Import middleware
 import socketMiddleware from "./middleware/socketMiddleware.js";
@@ -37,31 +36,36 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const HOST = process.env.HOST || 'localhost';
-const USE_HTTPS = process.env.USE_HTTPS === 'true';
-const CORS_ORIGINS = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ["https://localhost:5173", "http://localhost:5173"];
+const HOST = process.env.HOST || "localhost";
+const USE_HTTPS = process.env.USE_HTTPS === "true";
+const CORS_ORIGINS = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",")
+  : ["https://localhost:5173", "http://localhost:5173"];
 
 let server;
 
 // Create HTTPS server if certificates exist, otherwise HTTP
 if (USE_HTTPS) {
   try {
-    const keyPath = path.join(__dirname, '.cert', 'key.pem');
-    const certPath = path.join(__dirname, '.cert', 'key.pem');
-    
+    const keyPath = path.join(__dirname, ".cert", "key.pem");
+    const certPath = path.join(__dirname, ".cert", "key.pem");
+
     if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
       const httpsOptions = {
         key: fs.readFileSync(keyPath),
         cert: fs.readFileSync(certPath),
       };
       server = createHttpsServer(httpsOptions, app);
-      console.log('HTTPS server enabled');
+      console.log("HTTPS server enabled");
     } else {
-      console.log('HTTPS certificates not found, falling back to HTTP');
+      console.log("HTTPS certificates not found, falling back to HTTP");
       server = createServer(app);
     }
   } catch (error) {
-    console.log('Error loading HTTPS certificates, falling back to HTTP:', error.message);
+    console.log(
+      "Error loading HTTPS certificates, falling back to HTTP:",
+      error.message
+    );
     server = createServer(app);
   }
 } else {
@@ -77,12 +81,14 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors({
-  origin: CORS_ORIGINS,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: CORS_ORIGINS,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
 // Socket.IO connection handling
@@ -134,11 +140,14 @@ const startServer = async () => {
   try {
     await connectDB();
     server.listen(PORT, HOST, () => {
-      const protocol = USE_HTTPS && fs.existsSync(path.join(__dirname, '.cert', 'key.pem')) ? 'https' : 'http';
+      const protocol =
+        USE_HTTPS && fs.existsSync(path.join(__dirname, ".cert", "key.pem"))
+          ? "https"
+          : "http";
       console.log(`Server running on ${protocol}://${HOST}:${PORT}`);
       console.log(`API Base URL: ${protocol}://${HOST}:${PORT}/api`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`CORS Origins: ${CORS_ORIGINS.join(', ')}`);
+      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`CORS Origins: ${CORS_ORIGINS.join(", ")}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);
