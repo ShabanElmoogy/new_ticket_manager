@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -16,7 +16,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Popover
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -72,6 +73,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
     });
   });
 
+  const [colorPickerAnchor, setColorPickerAnchor] = useState<HTMLElement | null>(null);
   const [colorPickerIndex, setColorPickerIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -130,6 +132,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
       };
     }));
     setError(null);
+    setColorPickerAnchor(null);
     setColorPickerIndex(null);
     onClose();
   };
@@ -166,6 +169,16 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
     }
     
     setColumns(updatedColumns);
+  };
+
+  const handleColorPickerOpen = (event: React.MouseEvent<HTMLElement>, index: number) => {
+    setColorPickerAnchor(event.currentTarget);
+    setColorPickerIndex(index);
+  };
+
+  const handleColorPickerClose = () => {
+    setColorPickerAnchor(null);
+    setColorPickerIndex(null);
   };
 
   return (
@@ -281,7 +294,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
                           border: '1px solid #e0e0e0',
                           borderRight: 'none'
                         }}
-                        onClick={() => setColorPickerIndex(colorPickerIndex === index ? null : index)}
+                        onClick={(e) => handleColorPickerOpen(e, index)}
                       />
                       {/* Dark mode color */}
                       <Box
@@ -294,114 +307,10 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
                           border: '1px solid #e0e0e0',
                           borderLeft: 'none'
                         }}
-                        onClick={() => setColorPickerIndex(colorPickerIndex === index ? null : index)}
+                        onClick={(e) => handleColorPickerOpen(e, index)}
                       />
                     </Box>
                   </Box>
-                  {colorPickerIndex === index && (
-                    <Box sx={{ position: 'absolute', zIndex: 1000, mt: 1 }}>
-                      <Box
-                        sx={{
-                          position: 'fixed',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0
-                        }}
-                        onClick={() => setColorPickerIndex(null)}
-                      />
-                      <Box 
-                        sx={{ 
-                          p: 2, 
-                          backgroundColor: 'background.paper', 
-                          borderRadius: 1, 
-                          boxShadow: 3,
-                          border: '1px solid',
-                          borderColor: 'divider'
-                        }}
-                      >
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                          <Typography variant="subtitle2">
-                            Select Light Mode Color
-                          </Typography>
-                          <Button 
-                            size="small" 
-                            onClick={() => setColorPickerIndex(null)}
-                            sx={{ minWidth: 'auto', p: 0.5 }}
-                          >
-                            ✕
-                          </Button>
-                        </Box>
-                        <Typography variant="caption" color="text.secondary" display="block" mb={2}>
-                          Dark mode color will be automatically calculated
-                        </Typography>
-                        <Box 
-                          sx={{ 
-                            '& .react-colorful': {
-                              width: '200px !important',
-                              height: '150px !important'
-                            },
-                            '& .react-colorful__saturation': {
-                              borderRadius: '4px 4px 0 0'
-                            },
-                            '& .react-colorful__hue': {
-                              height: '20px',
-                              borderRadius: '0 0 4px 4px'
-                            },
-                            '& .react-colorful__pointer': {
-                              width: '16px',
-                              height: '16px'
-                            }
-                          }}
-                        >
-                          <HexColorPicker
-                            color={column.color}
-                            onChange={(color) => updateColumn(index, 'color', color)}
-                          />
-                        </Box>
-                        <Box display="flex" gap={2} mt={2} alignItems="center">
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">Light Mode:</Typography>
-                            <Box
-                              sx={{
-                                width: 50,
-                                height: 24,
-                                backgroundColor: column.color,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                mt: 0.5
-                              }}
-                            />
-                          </Box>
-                          <Box>
-                            <Typography variant="caption" color="text.secondary">Dark Mode:</Typography>
-                            <Box
-                              sx={{
-                                width: 50,
-                                height: 24,
-                                backgroundColor: column.darkColor,
-                                border: '1px solid',
-                                borderColor: 'divider',
-                                borderRadius: 1,
-                                mt: 0.5
-                              }}
-                            />
-                          </Box>
-                        </Box>
-                        <Box mt={2}>
-                          <Button 
-                            variant="contained" 
-                            size="small" 
-                            onClick={() => setColorPickerIndex(null)}
-                            fullWidth
-                          >
-                            Done
-                          </Button>
-                        </Box>
-                      </Box>
-                    </Box>
-                  )}
                 </Grid>
                 <Grid item xs={1}>
                   <IconButton 
@@ -415,6 +324,111 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
             </Box>
           ))}
         </Box>
+
+        {/* Color Picker Popover */}
+        <Popover
+          open={Boolean(colorPickerAnchor) && colorPickerIndex !== null}
+          anchorEl={colorPickerAnchor}
+          onClose={handleColorPickerClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          sx={{
+            '& .MuiPopover-paper': {
+              p: 2,
+              maxWidth: 280,
+            }
+          }}
+        >
+          {colorPickerIndex !== null && (
+            <Box>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                <Typography variant="subtitle2">
+                  Select Light Mode Color
+                </Typography>
+                <Button 
+                  size="small" 
+                  onClick={handleColorPickerClose}
+                  sx={{ minWidth: 'auto', p: 0.5 }}
+                >
+                  ✕
+                </Button>
+              </Box>
+              <Typography variant="caption" color="text.secondary" display="block" mb={2}>
+                Dark mode color will be automatically calculated
+              </Typography>
+              <Box 
+                sx={{ 
+                  '& .react-colorful': {
+                    width: '200px !important',
+                    height: '150px !important'
+                  },
+                  '& .react-colorful__saturation': {
+                    borderRadius: '4px 4px 0 0'
+                  },
+                  '& .react-colorful__hue': {
+                    height: '20px',
+                    borderRadius: '0 0 4px 4px'
+                  },
+                  '& .react-colorful__pointer': {
+                    width: '16px',
+                    height: '16px'
+                  }
+                }}
+              >
+                <HexColorPicker
+                  color={columns[colorPickerIndex]?.color || '#e3f2fd'}
+                  onChange={(color) => updateColumn(colorPickerIndex, 'color', color)}
+                />
+              </Box>
+              <Box display="flex" gap={2} mt={2} alignItems="center">
+                <Box>
+                  <Typography variant="caption" color="text.secondary">Light Mode:</Typography>
+                  <Box
+                    sx={{
+                      width: 50,
+                      height: 24,
+                      backgroundColor: columns[colorPickerIndex]?.color || '#e3f2fd',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      mt: 0.5
+                    }}
+                  />
+                </Box>
+                <Box>
+                  <Typography variant="caption" color="text.secondary">Dark Mode:</Typography>
+                  <Box
+                    sx={{
+                      width: 50,
+                      height: 24,
+                      backgroundColor: columns[colorPickerIndex]?.darkColor || '#1565c0',
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      mt: 0.5
+                    }}
+                  />
+                </Box>
+              </Box>
+              <Box mt={2}>
+                <Button 
+                  variant="contained" 
+                  size="small" 
+                  onClick={handleColorPickerClose}
+                  fullWidth
+                >
+                  Done
+                </Button>
+              </Box>
+            </Box>
+          )}
+        </Popover>
       </DialogContent>
 
       <DialogActions>
