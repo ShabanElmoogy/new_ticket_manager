@@ -280,7 +280,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
 
           {/* Column Edit Form */}
           {editingColumn && (
-            <Box sx={{ mt: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+            <Box sx={{ 
+              mt: 3, 
+              p: 2, 
+              border: `1px solid ${theme.palette.divider}`, 
+              borderRadius: 1 
+            }}>
               <Typography variant="h6" gutterBottom>
                 Edit Column: {editingColumn.name}
               </Typography>
@@ -326,7 +331,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           backgroundColor: columnForm.color,
                           borderRadius: '4px 0 0 4px',
                           cursor: 'pointer',
-                          border: '1px solid #e0e0e0',
+                          border: `1px solid ${theme.palette.divider}`,
                           borderRight: 'none'
                         }}
                         onClick={handleColorPickerOpen}
@@ -339,7 +344,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           backgroundColor: columnForm.darkColor,
                           borderRadius: '0 4px 4px 0',
                           cursor: 'pointer',
-                          border: '1px solid #e0e0e0',
+                          border: `1px solid ${theme.palette.divider}`,
                           borderLeft: 'none'
                         }}
                         onClick={handleColorPickerOpen}

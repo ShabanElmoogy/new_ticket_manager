@@ -6,7 +6,8 @@ import {
   Typography,
   Badge,
   Chip,
-  Alert
+  Alert,
+  useTheme
 } from '@mui/material';
 import type { KanbanColumn as KanbanColumnType, KanbanTicket, TicketStatus } from '../../types/kanban';
 import KanbanTicketCard from './KanbanTicketCard';
@@ -24,6 +25,9 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   tickets,
   boardId
 }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const getColumnTitle = () => {
     if (column) return column.name;
     
@@ -38,19 +42,51 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
   };
 
   const getColumnColor = () => {
-    if (column?.color) return column.color;
+    // Use theme-aware colors from column data
+    if (column?.color && column?.darkColor) {
+      return isDarkMode ? column.darkColor : column.color;
+    }
     
-    // Default colors for statuses
-    switch (status) {
-      case 'OPEN': return '#e3f2fd';
-      case 'IN_PROGRESS': return '#fff3e0';
-      case 'RESOLVED': return '#f3e5f5';
-      case 'CLOSED': return '#e8f5e8';
-      default: return '#f5f5f5';
+    // If column has only one color, use it for light mode and generate dark variant
+    if (column?.color) {
+      return column.color;
+    }
+    
+    // Default colors for statuses (theme-aware)
+    if (isDarkMode) {
+      switch (status) {
+        case 'OPEN': return '#0d47a1';        // Blue dark
+        case 'IN_PROGRESS': return '#e65100';  // Orange dark
+        case 'RESOLVED': return '#4a148c';     // Purple dark
+        case 'CLOSED': return '#1b5e20';       // Green dark
+        default: return '#212121';             // Grey dark
+      }
+    } else {
+      switch (status) {
+        case 'OPEN': return '#e3f2fd';         // Blue light
+        case 'IN_PROGRESS': return '#fff3e0';  // Orange light
+        case 'RESOLVED': return '#f3e5f5';     // Purple light
+        case 'CLOSED': return '#e8f5e8';       // Green light
+        default: return '#fafafa';             // Grey light
+      }
     }
   };
 
   const isWipLimitExceeded = column?.wipLimit && tickets.length > column.wipLimit;
+
+  const getTextColor = () => {
+    // Ensure good contrast for text based on background color
+    if (isDarkMode && column?.darkColor) {
+      // For dark theme with custom dark colors, use light text
+      return 'rgba(255, 255, 255, 0.87)';
+    }
+    if (!isDarkMode && column?.color) {
+      // For light theme with custom light colors, use dark text
+      return 'rgba(0, 0, 0, 0.87)';
+    }
+    // Use theme default text color for fallback colors
+    return theme.palette.text.primary;
+  };
 
   return (
     <Paper
@@ -62,11 +98,22 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: getColumnColor(),
-        border: isWipLimitExceeded ? '2px solid #f44336' : 'none'
+        border: isWipLimitExceeded ? '2px solid #f44336' : 'none',
+        color: getTextColor(),
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+        // Add subtle border for better definition in dark mode
+        ...(isDarkMode && {
+          border: isWipLimitExceeded 
+            ? '2px solid #f44336' 
+            : '1px solid rgba(255, 255, 255, 0.12)'
+        })
       }}
     >
       {/* Column Header */}
-      <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+      <Box sx={{ 
+        p: 2, 
+        borderBottom: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.12)' : '#e0e0e0'}` 
+      }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6" component="h2">
             {getColumnTitle()}
@@ -111,7 +158,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
               maxHeight: 'calc(100vh - 300px)',
               overflowY: 'auto',
               backgroundColor: snapshot.isDraggingOver 
-                ? 'rgba(0, 0, 0, 0.05)' 
+                ? (isDarkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)')
                 : 'transparent',
               transition: 'background-color 0.2s ease'
             }}

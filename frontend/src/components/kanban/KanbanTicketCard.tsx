@@ -11,6 +11,8 @@ import {
   MenuItem,
   Tooltip,
   LinearProgress,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import {
   MoreVert as MoreVertIcon,
@@ -35,6 +37,8 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
   isDragging,
   boardId,
 }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
@@ -52,17 +56,33 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
   };
 
   const getPriorityColor = (priority: Priority) => {
-    switch (priority) {
-      case "URGENT":
-        return "#f44336";
-      case "HIGH":
-        return "#ff9800";
-      case "MEDIUM":
-        return "#2196f3";
-      case "LOW":
-        return "#4caf50";
-      default:
-        return "#9e9e9e";
+    // Theme-aware priority colors
+    if (isDarkMode) {
+      switch (priority) {
+        case "URGENT":
+          return "#ff5252"; // Lighter red for dark mode
+        case "HIGH":
+          return "#ffb74d"; // Lighter orange for dark mode
+        case "MEDIUM":
+          return "#64b5f6"; // Lighter blue for dark mode
+        case "LOW":
+          return "#81c784"; // Lighter green for dark mode
+        default:
+          return "#bdbdbd"; // Lighter grey for dark mode
+      }
+    } else {
+      switch (priority) {
+        case "URGENT":
+          return "#d32f2f"; // Darker red for light mode
+        case "HIGH":
+          return "#f57c00"; // Darker orange for light mode
+        case "MEDIUM":
+          return "#1976d2"; // Darker blue for light mode
+        case "LOW":
+          return "#388e3c"; // Darker green for light mode
+        default:
+          return "#616161"; // Darker grey for light mode
+      }
     }
   };
 
@@ -78,12 +98,25 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
     const now = new Date();
     const tomorrow = addDays(now, 1);
 
+    // Theme-aware due date colors
     if (isBefore(dueDate, now)) {
-      return { status: "overdue", color: "#f44336" };
+      return { 
+        status: "overdue", 
+        color: isDarkMode ? "#ff5252" : "#d32f2f",
+        bgColor: isDarkMode ? "rgba(255, 82, 82, 0.15)" : "rgba(211, 47, 47, 0.1)"
+      };
     } else if (isBefore(dueDate, tomorrow)) {
-      return { status: "due-soon", color: "#ff9800" };
+      return { 
+        status: "due-soon", 
+        color: isDarkMode ? "#ffb74d" : "#f57c00",
+        bgColor: isDarkMode ? "rgba(255, 183, 77, 0.15)" : "rgba(245, 124, 0, 0.1)"
+      };
     }
-    return { status: "normal", color: "#4caf50" };
+    return { 
+      status: "normal", 
+      color: isDarkMode ? "#81c784" : "#388e3c",
+      bgColor: "transparent"
+    };
   };
 
   const getProgressPercentage = () => {
@@ -203,10 +236,13 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
                     sx={{
                       height: 4,
                       borderRadius: 2,
-                      backgroundColor: "rgba(0,0,0,0.1)",
+                      backgroundColor: isDarkMode 
+                        ? "rgba(255, 255, 255, 0.1)" 
+                        : "rgba(0, 0, 0, 0.1)",
                       "& .MuiLinearProgress-bar": {
-                        backgroundColor:
-                          progressPercentage > 100 ? "#f44336" : "#4caf50",
+                        backgroundColor: progressPercentage > 100 
+                          ? (isDarkMode ? "#ff5252" : "#d32f2f")
+                          : (isDarkMode ? "#81c784" : "#388e3c"),
                       },
                     }}
                   />
@@ -244,9 +280,16 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
               ) : (
                 <Tooltip title="Unassigned">
                   <Avatar
-                    sx={{ width: 24, height: 24, backgroundColor: "#e0e0e0" }}
+                    sx={{ 
+                      width: 24, 
+                      height: 24, 
+                      backgroundColor: isDarkMode ? "#424242" : "#e0e0e0" 
+                    }}
                   >
-                    <PersonIcon sx={{ fontSize: 14, color: "#9e9e9e" }} />
+                    <PersonIcon sx={{ 
+                      fontSize: 14, 
+                      color: isDarkMode ? "#bdbdbd" : "#9e9e9e" 
+                    }} />
                   </Avatar>
                 </Tooltip>
               )}
@@ -278,12 +321,7 @@ const KanbanTicketCard: React.FC<KanbanTicketCardProps> = ({
                     px: 0.5,
                     py: 0.25,
                     borderRadius: 1,
-                    backgroundColor:
-                      dueDateStatus?.status === "overdue"
-                        ? "rgba(244, 67, 54, 0.1)"
-                        : dueDateStatus?.status === "due-soon"
-                        ? "rgba(255, 152, 0, 0.1)"
-                        : "transparent",
+                    backgroundColor: dueDateStatus?.bgColor || "transparent",
                   }}
                 >
                   <CalendarIcon

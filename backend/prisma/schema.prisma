@@ -177,7 +177,8 @@ model KanbanColumn {
   id          String   @id @default(cuid())
   name        String
   description String?
-  color       String?  // Hex color code
+  color       String?
+  darkColor   String?  // Hex color code
   position    Int
   wipLimit    Int?     // Work in Progress limit
   isActive    Boolean  @default(true)

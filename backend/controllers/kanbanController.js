@@ -91,10 +91,6 @@ export const getAllBoards = async (req, res) => {
     console.log('Returning boards with items:', boardsWithItems.length);
     res.json(boardsWithItems);
   } catch (error) {
-    console.error('=== GET ALL BOARDS REQUEST ERROR ===');
-    console.error('Error fetching boards:', error);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       error: 'Failed to fetch boards',
       details: error.message 
@@ -227,13 +223,14 @@ export const createBoard = async (req, res) => {
             name: col.name,
             description: col.description,
             color: col.color,
+            darkColor: col.darkColor,
             position: index,
             wipLimit: col.wipLimit
           })) || [
-            { name: 'To Do', position: 0, color: '#e3f2fd' },
-            { name: 'In Progress', position: 1, color: '#fff3e0' },
-            { name: 'Review', position: 2, color: '#f3e5f5' },
-            { name: 'Done', position: 3, color: '#e8f5e8' }
+            { name: 'To Do', position: 0, color: '#e3f2fd', darkColor: '#0d47a1' },
+            { name: 'In Progress', position: 1, color: '#fff3e0', darkColor: '#e65100' },
+            { name: 'Review', position: 2, color: '#f3e5f5', darkColor: '#4a148c' },
+            { name: 'Done', position: 3, color: '#e8f5e8', darkColor: '#1b5e20' }
           ]
         },
         permissions: userId !== 'test-user-id' ? {
@@ -501,7 +498,7 @@ export const moveTask = async (req, res) => {
 export const addColumn = async (req, res) => {
   try {
     const { boardId } = req.params;
-    const { name, description, color, wipLimit } = req.body;
+    const { name, description, color, darkColor, wipLimit } = req.body;
 
     // Get the highest position
     const lastColumn = await prisma.kanbanColumn.findFirst({
@@ -516,6 +513,7 @@ export const addColumn = async (req, res) => {
         name,
         description,
         color,
+        darkColor,
         wipLimit,
         position,
         boardId
@@ -533,11 +531,11 @@ export const addColumn = async (req, res) => {
 export const updateColumn = async (req, res) => {
   try {
     const { columnId } = req.params;
-    const { name, description, color, wipLimit } = req.body;
+    const { name, description, color, darkColor, wipLimit } = req.body;
 
     const column = await prisma.kanbanColumn.update({
       where: { id: columnId },
-      data: { name, description, color, wipLimit }
+      data: { name, description, color, darkColor, wipLimit }
     });
 
     res.json(column);

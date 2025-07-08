@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  useTheme
 } from '@mui/material';
 import {
   PieChart,
@@ -50,6 +51,8 @@ const BoardAnalyticsDialog: React.FC<BoardAnalyticsDialogProps> = ({
   onClose,
   boardId
 }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
   const { analytics, fetchBoardAnalytics, loading, error } = useKanbanStore();
   
   const [dateRange, setDateRange] = useState('30days');
@@ -118,22 +121,44 @@ const BoardAnalyticsDialog: React.FC<BoardAnalyticsDialogProps> = ({
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'OPEN': return '#e3f2fd';
-      case 'IN_PROGRESS': return '#fff3e0';
-      case 'RESOLVED': return '#f3e5f5';
-      case 'CLOSED': return '#e8f5e8';
-      default: return '#f5f5f5';
+    // Theme-aware status colors
+    if (isDarkMode) {
+      switch (status) {
+        case 'OPEN': return '#1976d2';      // Blue main
+        case 'IN_PROGRESS': return '#f57c00'; // Orange main
+        case 'RESOLVED': return '#7b1fa2';   // Purple main
+        case 'CLOSED': return '#388e3c';     // Green main
+        default: return '#616161';           // Grey main
+      }
+    } else {
+      switch (status) {
+        case 'OPEN': return '#e3f2fd';       // Blue light
+        case 'IN_PROGRESS': return '#fff3e0'; // Orange light
+        case 'RESOLVED': return '#f3e5f5';   // Purple light
+        case 'CLOSED': return '#e8f5e8';     // Green light
+        default: return '#fafafa';           // Grey light
+      }
     }
   };
 
   const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'URGENT': return '#f44336';
-      case 'HIGH': return '#ff9800';
-      case 'MEDIUM': return '#2196f3';
-      case 'LOW': return '#4caf50';
-      default: return '#9e9e9e';
+    // Theme-aware priority colors
+    if (isDarkMode) {
+      switch (priority) {
+        case 'URGENT': return '#ff5252';  // Lighter red for dark mode
+        case 'HIGH': return '#ffb74d';    // Lighter orange for dark mode
+        case 'MEDIUM': return '#64b5f6';  // Lighter blue for dark mode
+        case 'LOW': return '#81c784';     // Lighter green for dark mode
+        default: return '#bdbdbd';        // Lighter grey for dark mode
+      }
+    } else {
+      switch (priority) {
+        case 'URGENT': return '#d32f2f';  // Darker red for light mode
+        case 'HIGH': return '#f57c00';    // Darker orange for light mode
+        case 'MEDIUM': return '#1976d2';  // Darker blue for light mode
+        case 'LOW': return '#388e3c';     // Darker green for light mode
+        default: return '#616161';        // Darker grey for light mode
+      }
     }
   };
 
@@ -269,14 +294,21 @@ const BoardAnalyticsDialog: React.FC<BoardAnalyticsDialogProps> = ({
                           labelLine={false}
                           label={({ name, value }) => `${name}: ${value}`}
                           outerRadius={80}
-                          fill="#8884d8"
+                          fill={isDarkMode ? "#90caf9" : "#1976d2"}
                           dataKey="value"
                         >
                           {formatStatusData().map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: isDarkMode ? '#424242' : '#ffffff',
+                            border: `1px solid ${isDarkMode ? '#616161' : '#e0e0e0'}`,
+                            borderRadius: '4px',
+                            color: isDarkMode ? '#ffffff' : '#000000'
+                          }}
+                        />
                       </PieChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -291,11 +323,26 @@ const BoardAnalyticsDialog: React.FC<BoardAnalyticsDialogProps> = ({
                     </Typography>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={formatPriorityData()}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="value" fill="#8884d8">
+                        <CartesianGrid 
+                          strokeDasharray="3 3" 
+                          stroke={isDarkMode ? '#616161' : '#e0e0e0'}
+                        />
+                        <XAxis 
+                          dataKey="name" 
+                          tick={{ fill: isDarkMode ? '#ffffff' : '#000000' }}
+                        />
+                        <YAxis 
+                          tick={{ fill: isDarkMode ? '#ffffff' : '#000000' }}
+                        />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: isDarkMode ? '#424242' : '#ffffff',
+                            border: `1px solid ${isDarkMode ? '#616161' : '#e0e0e0'}`,
+                            borderRadius: '4px',
+                            color: isDarkMode ? '#ffffff' : '#000000'
+                          }}
+                        />
+                        <Bar dataKey="value" fill={isDarkMode ? "#90caf9" : "#1976d2"}>
                           {formatPriorityData().map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}

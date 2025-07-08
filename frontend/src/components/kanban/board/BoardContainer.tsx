@@ -1,32 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Alert,
-  Button,
-  CircularProgress,
-} from '@mui/material';
-import { DragDropContext, type DropResult } from '@hello-pangea/dnd';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { isAfter, isBefore, parseISO } from 'date-fns';
+import React, { useEffect, useState } from "react";
+import { Box, Alert, Button, CircularProgress, useTheme } from "@mui/material";
+import { DragDropContext, type DropResult } from "@hello-pangea/dnd";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { isAfter, isBefore, parseISO } from "date-fns";
 
-import { useKanbanStore } from '../../../stores/kanbanStore';
+import { useKanbanStore } from "../../../stores/kanbanStore";
 import type {
   KanbanColumn as KanbanColumnType,
   KanbanTicket,
   TicketStatus,
-} from '../../../types/kanban';
+} from "../../../types/kanban";
 
-import BoardHeader from './BoardHeader';
-import BoardControls from './BoardControls';
-import BoardStats from './BoardStats';
-import BoardFilters from './BoardFilters';
-import BoardMenu from './BoardMenu';
-import KanbanColumn from '../KanbanColumn';
-import CreateTicketDialog from '../CreateTicketDialog';
-import BoardSettingsDialog from '../BoardSettingsDialog';
-import BoardAnalyticsDialog from '../BoardAnalyticsDialog';
-import CreateBoardDialog from '../CreateBoardDialog';
+import BoardHeader from "./BoardHeader";
+import BoardControls from "./BoardControls";
+import BoardStats from "./BoardStats";
+import BoardFilters from "./BoardFilters";
+import BoardMenu from "./BoardMenu";
+import KanbanColumn from "../KanbanColumn";
+import CreateTicketDialog from "../CreateTicketDialog";
+import BoardSettingsDialog from "../BoardSettingsDialog";
+import BoardAnalyticsDialog from "../BoardAnalyticsDialog";
+import CreateBoardDialog from "../CreateBoardDialog";
 
 interface BoardContainerProps {
   boardId: string;
@@ -48,14 +43,9 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
   createBoardOpen,
   setCreateBoardOpen,
 }) => {
-  const {
-    currentBoard,
-    loading,
-    error,
-    fetchBoard,
-    moveTicket,
-    clearError,
-  } = useKanbanStore();
+  const theme = useTheme();
+  const { currentBoard, loading, error, fetchBoard, moveTicket, clearError } =
+    useKanbanStore();
 
   // UI State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -67,14 +57,14 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
   // Filter State
   const [dueDateFrom, setDueDateFrom] = useState<Date | null>(null);
   const [dueDateTo, setDueDateTo] = useState<Date | null>(null);
-  const [priorityFilter, setPriorityFilter] = useState<string>('');
-  const [assigneeFilter, setAssigneeFilter] = useState<string>('');
-  const [customerFilter, setCustomerFilter] = useState<string>('');
-  const [applicationFilter, setApplicationFilter] = useState<string>('');
-  const [createdByFilter, setCreatedByFilter] = useState<string>('');
-  const [estimatedHoursMin, setEstimatedHoursMin] = useState<number | ''>('');
-  const [estimatedHoursMax, setEstimatedHoursMax] = useState<number | ''>('');
-  const [searchFilter, setSearchFilter] = useState<string>('');
+  const [priorityFilter, setPriorityFilter] = useState<string>("");
+  const [assigneeFilter, setAssigneeFilter] = useState<string>("");
+  const [customerFilter, setCustomerFilter] = useState<string>("");
+  const [applicationFilter, setApplicationFilter] = useState<string>("");
+  const [createdByFilter, setCreatedByFilter] = useState<string>("");
+  const [estimatedHoursMin, setEstimatedHoursMin] = useState<number | "">("");
+  const [estimatedHoursMax, setEstimatedHoursMax] = useState<number | "">("");
+  const [searchFilter, setSearchFilter] = useState<string>("");
 
   useEffect(() => {
     if (boardId) {
@@ -95,14 +85,14 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
     }
 
     const newStatus = destination.droppableId.replace(
-      'column-',
-      ''
+      "column-",
+      ""
     ) as TicketStatus;
 
     try {
       await moveTicket(draggableId, newStatus, destination.index, boardId);
     } catch (error) {
-      console.error('Failed to move ticket:', error);
+      console.error("Failed to move ticket:", error);
     }
   };
 
@@ -163,11 +153,11 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
 
         // Assignee filter
         if (assigneeFilter) {
-          if (assigneeFilter === 'unassigned' && ticket.assignedTo) {
+          if (assigneeFilter === "unassigned" && ticket.assignedTo) {
             return false;
           }
           if (
-            assigneeFilter !== 'unassigned' &&
+            assigneeFilter !== "unassigned" &&
             ticket.assignedTo?.id !== assigneeFilter
           ) {
             return false;
@@ -176,11 +166,11 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
 
         // Customer filter
         if (customerFilter) {
-          if (customerFilter === 'no-customer' && ticket.customer) {
+          if (customerFilter === "no-customer" && ticket.customer) {
             return false;
           }
           if (
-            customerFilter !== 'no-customer' &&
+            customerFilter !== "no-customer" &&
             ticket.customer?.id !== customerFilter
           ) {
             return false;
@@ -189,11 +179,11 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
 
         // Application filter
         if (applicationFilter) {
-          if (applicationFilter === 'no-application' && ticket.application) {
+          if (applicationFilter === "no-application" && ticket.application) {
             return false;
           }
           if (
-            applicationFilter !== 'no-application' &&
+            applicationFilter !== "no-application" &&
             ticket.application?.id !== applicationFilter
           ) {
             return false;
@@ -206,12 +196,12 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
         }
 
         // Number-based estimated hours filter
-        if (estimatedHoursMin !== '' || estimatedHoursMax !== '') {
+        if (estimatedHoursMin !== "" || estimatedHoursMax !== "") {
           const hours = ticket.estimatedHours || 0;
-          if (estimatedHoursMin !== '' && hours < estimatedHoursMin) {
+          if (estimatedHoursMin !== "" && hours < estimatedHoursMin) {
             return false;
           }
-          if (estimatedHoursMax !== '' && hours > estimatedHoursMax) {
+          if (estimatedHoursMax !== "" && hours > estimatedHoursMax) {
             return false;
           }
         }
@@ -224,27 +214,27 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
   const clearFilters = () => {
     setDueDateFrom(null);
     setDueDateTo(null);
-    setPriorityFilter('');
-    setAssigneeFilter('');
-    setCustomerFilter('');
-    setApplicationFilter('');
-    setCreatedByFilter('');
-    setEstimatedHoursMin('');
-    setEstimatedHoursMax('');
-    setSearchFilter('');
+    setPriorityFilter("");
+    setAssigneeFilter("");
+    setCustomerFilter("");
+    setApplicationFilter("");
+    setCreatedByFilter("");
+    setEstimatedHoursMin("");
+    setEstimatedHoursMax("");
+    setSearchFilter("");
   };
 
   const hasActiveFilters = Boolean(
     dueDateFrom ||
-    dueDateTo ||
-    priorityFilter ||
-    assigneeFilter ||
-    customerFilter ||
-    applicationFilter ||
-    createdByFilter ||
-    estimatedHoursMin !== '' ||
-    estimatedHoursMax !== '' ||
-    searchFilter
+      dueDateTo ||
+      priorityFilter ||
+      assigneeFilter ||
+      customerFilter ||
+      applicationFilter ||
+      createdByFilter ||
+      estimatedHoursMin !== "" ||
+      estimatedHoursMax !== "" ||
+      searchFilter
   );
 
   const getUniqueAssignees = () => {
@@ -305,12 +295,12 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
     if (!currentBoard) return undefined;
     return currentBoard.columns.find(
       (col) =>
-        col.name.toUpperCase().replace(/\s+/g, '_') === status ||
-        (status === 'OPEN' && col.name.toLowerCase().includes('todo')) ||
-        (status === 'IN_PROGRESS' &&
-          col.name.toLowerCase().includes('progress')) ||
-        (status === 'RESOLVED' && col.name.toLowerCase().includes('review')) ||
-        (status === 'CLOSED' && col.name.toLowerCase().includes('done'))
+        col.name.toUpperCase().replace(/\s+/g, "_") === status ||
+        (status === "OPEN" && col.name.toLowerCase().includes("todo")) ||
+        (status === "IN_PROGRESS" &&
+          col.name.toLowerCase().includes("progress")) ||
+        (status === "RESOLVED" && col.name.toLowerCase().includes("review")) ||
+        (status === "CLOSED" && col.name.toLowerCase().includes("done"))
     );
   };
 
@@ -321,8 +311,16 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
         justifyContent="center"
         alignItems="center"
         height="400px"
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}
       >
-        <CircularProgress />
+        <CircularProgress
+          sx={{
+            color: theme.palette.primary.main,
+          }}
+        />
       </Box>
     );
   }
@@ -332,10 +330,25 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
       <Alert
         severity="error"
         action={
-          <Button color="inherit" size="small" onClick={clearError}>
+          <Button
+            color="inherit"
+            size="small"
+            onClick={clearError}
+            sx={{
+              color: theme.palette.error.contrastText,
+              "&:hover": {
+                backgroundColor: theme.palette.error.dark,
+              },
+            }}
+          >
             Dismiss
           </Button>
         }
+        sx={{
+          backgroundColor: theme.palette.error.light,
+          color: theme.palette.error.contrastText,
+          border: `1px solid ${theme.palette.error.main}`,
+        }}
       >
         {error}
       </Alert>
@@ -344,22 +357,37 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
 
   if (!currentBoard) {
     return (
-      <Alert severity="info">
+      <Alert
+        severity="info"
+        sx={{
+          backgroundColor: theme.palette.info.light,
+          color: theme.palette.info.contrastText,
+          border: `1px solid ${theme.palette.info.main}`,
+        }}
+      >
         Board not found or you don't have access to it.
       </Alert>
     );
   }
 
   const statusColumns: TicketStatus[] = [
-    'OPEN',
-    'IN_PROGRESS',
-    'RESOLVED',
-    'CLOSED',
+    "OPEN",
+    "IN_PROGRESS",
+    "RESOLVED",
+    "CLOSED",
   ];
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}
+      >
         <BoardHeader currentBoard={currentBoard}>
           <BoardControls
             boards={boards}
@@ -412,16 +440,38 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
         </BoardHeader>
 
         {/* Kanban Columns */}
-        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+        <Box
+          sx={{
+            flex: 1,
+            overflow: "hidden",
+            backgroundColor: theme.palette.background.paper,
+          }}
+        >
           <DragDropContext onDragEnd={handleDragEnd}>
             <Box
               display="flex"
               gap={{ xs: 1, sm: 2 }}
               sx={{
-                height: '100%',
-                overflowX: 'auto',
-                overflowY: 'hidden',
+                height: "100%",
+                overflowX: "auto",
+                overflowY: "hidden",
                 pb: 2,
+                backgroundColor: theme.palette.background.default,
+                borderTop: `1px solid ${theme.palette.divider}`,
+                // Custom scrollbar styling for theme support
+                "&::-webkit-scrollbar": {
+                  height: "8px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: theme.palette.action.hover,
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: theme.palette.action.selected,
+                  borderRadius: "4px",
+                  "&:hover": {
+                    backgroundColor: theme.palette.action.focus,
+                  },
+                },
               }}
             >
               {statusColumns.map((status) => {

@@ -18,6 +18,7 @@ export interface KanbanColumn {
   name: string;
   description?: string;
   color?: string;
+  darkColor?: string;
   position: number;
   wipLimit?: number;
   isActive: boolean;
@@ -141,32 +142,32 @@ export interface Application {
   version?: string;
 }
 
-export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'REVIEW' | 'DONE';
-export type BoardType = 'TICKETS' | 'TASKS';
-export type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-export type BoardPermissionRole = 'VIEWER' | 'EDITOR' | 'ADMIN';
-export type ActivityType = 
-  | 'CREATED' 
-  | 'UPDATED' 
-  | 'STATUS_CHANGED' 
-  | 'ASSIGNED' 
-  | 'UNASSIGNED' 
-  | 'MOVED' 
-  | 'COMMENTED' 
-  | 'LABEL_ADDED' 
-  | 'LABEL_REMOVED' 
-  | 'DUE_DATE_CHANGED' 
-  | 'PRIORITY_CHANGED';
+export type TicketStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "REVIEW" | "DONE";
+export type BoardType = "TICKETS" | "TASKS";
+export type Priority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type BoardPermissionRole = "VIEWER" | "EDITOR" | "ADMIN";
+export type ActivityType =
+  | "CREATED"
+  | "UPDATED"
+  | "STATUS_CHANGED"
+  | "ASSIGNED"
+  | "UNASSIGNED"
+  | "MOVED"
+  | "COMMENTED"
+  | "LABEL_ADDED"
+  | "LABEL_REMOVED"
+  | "DUE_DATE_CHANGED"
+  | "PRIORITY_CHANGED";
 
-export type NotificationType = 
-  | 'TICKET_ASSIGNED' 
-  | 'TICKET_UPDATED' 
-  | 'TICKET_COMMENTED' 
-  | 'TICKET_DUE_SOON' 
-  | 'TICKET_OVERDUE' 
-  | 'MENTION' 
-  | 'STATUS_CHANGED';
+export type NotificationType =
+  | "TICKET_ASSIGNED"
+  | "TICKET_UPDATED"
+  | "TICKET_COMMENTED"
+  | "TICKET_DUE_SOON"
+  | "TICKET_OVERDUE"
+  | "MENTION"
+  | "STATUS_CHANGED";
 
 export interface BoardAnalytics {
   ticketsByStatus: Array<{
