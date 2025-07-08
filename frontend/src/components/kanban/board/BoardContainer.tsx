@@ -22,6 +22,7 @@ import CreateTicketDialog from "../CreateTicketDialog";
 import BoardSettingsDialog from "../BoardSettingsDialog";
 import BoardAnalyticsDialog from "../BoardAnalyticsDialog";
 import CreateBoardDialog from "../CreateBoardDialog";
+import DeleteBoardDialog from "../DeleteBoardDialog";
 
 interface BoardContainerProps {
   boardId: string;
@@ -53,6 +54,7 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [deleteBoardOpen, setDeleteBoardOpen] = useState(false);
 
   // Filter State
   const [dueDateFrom, setDueDateFrom] = useState<Date | null>(null);
@@ -500,6 +502,9 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
           onRefresh={handleRefresh}
           onSettings={() => setSettingsOpen(true)}
           onAnalytics={() => setAnalyticsOpen(true)}
+          onDelete={() => setDeleteBoardOpen(true)}
+          canDelete={currentBoard ? !currentBoard.isDefault : false}
+          isDefaultBoard={currentBoard?.isDefault || false}
         />
 
         {/* Dialogs */}
@@ -527,6 +532,19 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
           open={createBoardOpen}
           onClose={() => setCreateBoardOpen(false)}
         />
+
+        {currentBoard && (
+          <DeleteBoardDialog
+            open={deleteBoardOpen}
+            onClose={() => setDeleteBoardOpen(false)}
+            boardId={currentBoard.id}
+            boardName={currentBoard.name}
+            boardType={currentBoard.type}
+            ticketCount={currentBoard.tickets?.length || 0}
+            taskCount={currentBoard.tasks?.length || 0}
+            isDefault={currentBoard.isDefault}
+          />
+        )}
       </Box>
     </LocalizationProvider>
   );

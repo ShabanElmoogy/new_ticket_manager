@@ -143,10 +143,6 @@ const startServer = async () => {
         USE_HTTPS && fs.existsSync(path.join(__dirname, ".cert", "key.pem"))
           ? "https"
           : "http";
-      console.log(`Server running on ${protocol}://${HOST}:${PORT}`);
-      console.log(`API Base URL: ${protocol}://${HOST}:${PORT}/api`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`CORS Origins: ${CORS_ORIGINS.join(", ")}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);

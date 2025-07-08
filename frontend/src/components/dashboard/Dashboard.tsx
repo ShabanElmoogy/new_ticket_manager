@@ -24,8 +24,6 @@ import {
   type Customer,
   type Application,
 } from "../../services/api";
-import { kanbanApi } from "../../services/kanbanApi";
-import type { KanbanBoard } from "../../types/kanban";
 import Header from "./Header";
 import StatsCards from "./StatsCards";
 import CreateTicketPost from "../tickets/CreateTicketPost";
@@ -63,8 +61,7 @@ const Dashboard: React.FC = () => {
   const [employees, setEmployees] = useState<User[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [defaultBoard, setDefaultBoard] = useState<KanbanBoard | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [statusFilter, setStatusFilter] = useState("");
@@ -81,43 +78,22 @@ const Dashboard: React.FC = () => {
     message: "",
     severity: "success" as "success" | "error" | "warning" | "info",
   });
-
-  const getOrCreateDefaultBoard = async (): Promise<KanbanBoard | null> => {
-    try {
-      // Get all boards
-      const boards = await kanbanApi.getAllBoards();
-
-      // Look for a default board or the first available board
-      let defaultBoard = boards.find((board) => board.isDefault) || boards[0];
-
-      // If no boards exist, create a default one
-      if (!defaultBoard) {
-        defaultBoard = await kanbanApi.createBoard({
-          name: "Main Board",
-          description: "Default board for all tickets",
-          isDefault: true,
-        });
-      }
-
-      return defaultBoard;
-    } catch (error) {
-      console.error("Error getting/creating default board:", error);
-      return null;
-    }
-  };
+  const [isInitializing, setIsInitializing] = useState(false);
 
   const fetchInitialData = async () => {
-    if (!token) return;
+    console.log('=== fetchInitialData called ===', { token: !!token, isInitializing });
+    if (!token || isInitializing) return;
 
     try {
+      setIsInitializing(true);
       setLoading(true);
+      console.log('Starting fetchInitialData...');
       const [
         ticketsData,
         employeesData,
         usersData,
         customersData,
         applicationsData,
-        defaultBoardData,
       ] = await Promise.all([
         apiService.getTickets(token, {}), // Get all tickets initially
         user?.role === "ADMIN"
@@ -132,7 +108,6 @@ const Dashboard: React.FC = () => {
         user?.role === "ADMIN"
           ? apiService.getApplications(token)
           : Promise.resolve([]),
-        getOrCreateDefaultBoard(),
       ]);
 
       // Calculate stats from all tickets initially
@@ -143,11 +118,11 @@ const Dashboard: React.FC = () => {
       setAllUsers(usersData);
       setCustomers(customersData);
       setApplications(applicationsData);
-      setDefaultBoard(defaultBoardData);
     } catch (error) {
       showSnackbar("Error fetching data", "error");
     } finally {
       setLoading(false);
+      setIsInitializing(false);
     }
   };
 
@@ -283,6 +258,7 @@ const Dashboard: React.FC = () => {
 
   // Initial load
   useEffect(() => {
+    console.log('=== useEffect for fetchInitialData triggered ===', { token: !!token });
     fetchInitialData();
   }, [token]);
 
@@ -360,13 +336,9 @@ const Dashboard: React.FC = () => {
     if (!token) return;
 
     try {
-      // Add the default board ID to the ticket data
-      const ticketWithBoard = {
-        ...ticketData,
-        boardId: defaultBoard?.id,
-      };
-
-      await apiService.createTicket(token, ticketWithBoard);
+      // Create ticket without requiring a specific board
+      // The backend will handle board assignment
+      await apiService.createTicket(token, ticketData);
       showSnackbar("Ticket posted successfully! 🎉", "success");
       fetchData();
     } catch (error) {

@@ -41,7 +41,9 @@ export const kanbanApi = {
   },
 
   createBoard: async (boardData: Partial<KanbanBoard>): Promise<KanbanBoard> => {
+    console.log('=== KANBAN API createBoard called ===', boardData);
     const response = await api.post('/kanban/boards', boardData);
+    console.log('=== KANBAN API createBoard response ===', response.data);
     return response.data;
   },
 
@@ -50,8 +52,48 @@ export const kanbanApi = {
     return response.data;
   },
 
-  deleteBoard: async (boardId: string): Promise<void> => {
-    await api.delete(`/kanban/boards/${boardId}`);
+  getTargetBoards: async (boardId: string): Promise<{
+    sourceBoard: {
+      id: string;
+      name: string;
+      type: 'TICKETS' | 'TASKS';
+    };
+    targetBoards: Array<{
+      id: string;
+      name: string;
+      description?: string;
+      isDefault: boolean;
+      type: 'TICKETS' | 'TASKS';
+      itemCount: number;
+    }>;
+  }> => {
+    const response = await api.get(`/kanban/boards/${boardId}/target-boards`);
+    return response.data;
+  },
+
+  deleteBoard: async (
+    boardId: string, 
+    options?: {
+      preserveItems?: boolean;
+      targetBoardId?: string;
+    }
+  ): Promise<{
+    message: string;
+    deletedBoard: {
+      id: string;
+      name: string;
+    };
+    itemsMovedTo?: {
+      boardId: string;
+      boardName: string;
+      movedTickets: number;
+      movedTasks: number;
+    };
+  }> => {
+    const response = await api.delete(`/kanban/boards/${boardId}`, {
+      data: options
+    });
+    return response.data;
   },
 
   // Ticket movement

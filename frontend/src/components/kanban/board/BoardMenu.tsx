@@ -34,6 +34,7 @@ interface BoardMenuProps {
   onExport?: () => void;
   canEdit?: boolean;
   canDelete?: boolean;
+  isDefaultBoard?: boolean;
 }
 
 const BoardMenu: React.FC<BoardMenuProps> = ({
@@ -50,6 +51,7 @@ const BoardMenu: React.FC<BoardMenuProps> = ({
   onExport,
   canEdit = true,
   canDelete = false,
+  isDefaultBoard = false,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -280,7 +282,7 @@ const BoardMenu: React.FC<BoardMenuProps> = ({
       )}
 
       {/* Danger Zone Section */}
-      {canDelete && onDelete && (
+      {(canDelete || isDefaultBoard) && onDelete && (
         <>
           <Divider
             sx={{
@@ -308,15 +310,46 @@ const BoardMenu: React.FC<BoardMenuProps> = ({
             Danger Zone
           </Typography>
 
-          <MenuItem
-            onClick={() => handleMenuItemClick(onDelete)}
-            sx={getMenuItemStyles("danger")}
-          >
-            <ListItemIcon sx={getIconStyles()}>
-              <DeleteIcon />
-            </ListItemIcon>
-            <ListItemText primary="Delete Board" sx={getTextStyles()} />
-          </MenuItem>
+          {canDelete ? (
+            <MenuItem
+              onClick={() => handleMenuItemClick(onDelete)}
+              sx={getMenuItemStyles("danger")}
+            >
+              <ListItemIcon sx={getIconStyles()}>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText primary="Delete Board" sx={getTextStyles()} />
+            </MenuItem>
+          ) : isDefaultBoard ? (
+            <MenuItem
+              disabled
+              sx={{
+                ...getMenuItemStyles("default"),
+                opacity: 0.5,
+                cursor: "not-allowed",
+                "&:hover": {
+                  backgroundColor: "transparent",
+                  transform: "none",
+                },
+              }}
+            >
+              <ListItemIcon sx={getIconStyles()}>
+                <DeleteIcon />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Delete Board" 
+                secondary="Cannot delete default board"
+                sx={{
+                  ...getTextStyles(),
+                  "& .MuiListItemText-secondary": {
+                    fontSize: "0.75rem",
+                    color: theme.palette.text.disabled,
+                    fontStyle: "italic",
+                  },
+                }}
+              />
+            </MenuItem>
+          ) : null}
         </>
       )}
     </Menu>

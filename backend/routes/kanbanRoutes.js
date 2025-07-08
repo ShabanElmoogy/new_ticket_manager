@@ -7,6 +7,7 @@ const router = express.Router();
 // Board Routes
 router.get('/boards', authenticateToken, kanbanController.getAllBoards);
 router.get('/boards/:id', authenticateToken, kanbanController.getBoardById);
+router.get('/boards/:id/target-boards', authenticateToken, kanbanController.getTargetBoards);
 router.post('/boards', kanbanController.createBoard);
 router.put('/boards/:id', authenticateToken, requireAdmin, kanbanController.updateBoard);
 router.delete('/boards/:id', authenticateToken, requireAdmin, kanbanController.deleteBoard);

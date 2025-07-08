@@ -212,6 +212,29 @@ export const createBoard = async (req, res) => {
 
     console.log('Normalized board type:', boardType);
 
+    // If this board is being set as default, ensure no other board of the same type is default
+    if (isDefault) {
+      console.log('Setting as default board, checking for existing default boards...');
+      
+      // Find existing default board of the same type
+      const existingDefaultBoard = await prisma.kanbanBoard.findFirst({
+        where: {
+          type: boardType,
+          isDefault: true,
+          isActive: true
+        }
+      });
+
+      if (existingDefaultBoard) {
+        console.log('Found existing default board, removing default status:', existingDefaultBoard.id);
+        // Remove default status from existing board
+        await prisma.kanbanBoard.update({
+          where: { id: existingDefaultBoard.id },
+          data: { isDefault: false }
+        });
+      }
+    }
+
     const board = await prisma.kanbanBoard.create({
       data: {
         name,
@@ -301,32 +324,278 @@ export const updateBoard = async (req, res) => {
   }
 };
 
-// Delete board
-export const deleteBoard = async (req, res) => {
+// Get available target boards for moving items when deleting a board
+export const getTargetBoards = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // Board ID to be deleted
 
-    await prisma.kanbanBoard.update({
+    // Get the board to be deleted to check its type
+    const boardToDelete = await prisma.kanbanBoard.findUnique({
       where: { id },
-      data: { isActive: false }
+      select: { type: true, name: true }
     });
 
-    res.json({ message: 'Board deleted successfully' });
+    if (!boardToDelete) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+
+    // Find all active boards of the same type (excluding the one being deleted)
+    const targetBoards = await prisma.kanbanBoard.findMany({
+      where: {
+        isActive: true,
+        type: boardToDelete.type,
+        id: { not: id }
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        isDefault: true,
+        type: true,
+        _count: {
+          select: {
+            tickets: true,
+            tasks: true
+          }
+        }
+      },
+      orderBy: [
+        { isDefault: 'desc' }, // Default boards first
+        { name: 'asc' }        // Then alphabetical
+      ]
+    });
+
+    res.json({
+      sourceBoard: {
+        id,
+        name: boardToDelete.name,
+        type: boardToDelete.type
+      },
+      targetBoards: targetBoards.map(board => ({
+        id: board.id,
+        name: board.name,
+        description: board.description,
+        isDefault: board.isDefault,
+        type: board.type,
+        itemCount: board.type === 'TICKETS' ? board._count.tickets : board._count.tasks
+      }))
+    });
   } catch (error) {
+    console.error('Error fetching target boards:', error);
+    res.status(500).json({ error: 'Failed to fetch target boards' });
+  }
+};
+
+// Delete board without deleting tickets/tasks
+export const deleteBoard = async (req, res) => {
+  console.log('=== DELETE BOARD REQUEST START ===');
+  console.log('Board ID:', req.params.id);
+  console.log('User:', req.user);
+  
+  try {
+    const { id } = req.params;
+    const { preserveItems = true, targetBoardId } = req.body;
+
+    // Get the board to be deleted
+    const boardToDelete = await prisma.kanbanBoard.findUnique({
+      where: { id },
+      include: {
+        tickets: true,
+        tasks: true
+      }
+    });
+
+    if (!boardToDelete) {
+      return res.status(404).json({ error: 'Board not found' });
+    }
+
+    console.log('Board to delete:', {
+      id: boardToDelete.id,
+      name: boardToDelete.name,
+      type: boardToDelete.type,
+      ticketsCount: boardToDelete.tickets.length,
+      tasksCount: boardToDelete.tasks.length
+    });
+
+    // Check if this is the last active board
+    const activeBoardsCount = await prisma.kanbanBoard.count({
+      where: { isActive: true }
+    });
+
+    if (activeBoardsCount <= 1) {
+      return res.status(400).json({ 
+        error: 'Cannot delete the last active board. Create another board first.' 
+      });
+    }
+
+    let targetBoard = null;
+    
+    if (preserveItems && (boardToDelete.tickets.length > 0 || boardToDelete.tasks.length > 0)) {
+      // Find target board for tickets/tasks
+      if (targetBoardId) {
+        // Use specified target board
+        targetBoard = await prisma.kanbanBoard.findUnique({
+          where: { id: targetBoardId, isActive: true }
+        });
+        
+        if (!targetBoard) {
+          return res.status(400).json({ 
+            error: 'Target board not found or inactive' 
+          });
+        }
+
+        // Verify board type compatibility
+        if (targetBoard.type !== boardToDelete.type) {
+          return res.status(400).json({ 
+            error: `Cannot move ${boardToDelete.type.toLowerCase()} to a ${targetBoard.type.toLowerCase()} board` 
+          });
+        }
+      } else {
+        // Find default board or first available board of the same type
+        targetBoard = await prisma.kanbanBoard.findFirst({
+          where: { 
+            isActive: true,
+            type: boardToDelete.type,
+            id: { not: id }, // Exclude the board being deleted
+            OR: [
+              { isDefault: true },
+              { isDefault: false }
+            ]
+          },
+          orderBy: [
+            { isDefault: 'desc' }, // Prefer default board
+            { createdAt: 'asc' }    // Then oldest board
+          ]
+        });
+
+        if (!targetBoard) {
+          return res.status(400).json({ 
+            error: `No available ${boardToDelete.type.toLowerCase()} board found to move items to` 
+          });
+        }
+      }
+
+      console.log('Target board for items:', {
+        id: targetBoard.id,
+        name: targetBoard.name,
+        type: targetBoard.type,
+        isDefault: targetBoard.isDefault
+      });
+    }
+
+    // Start transaction to ensure data consistency
+    const result = await prisma.$transaction(async (tx) => {
+      let movedTicketsCount = 0;
+      let movedTasksCount = 0;
+
+      if (preserveItems && targetBoard) {
+        // Move tickets to target board
+        if (boardToDelete.tickets.length > 0) {
+          const ticketUpdateResult = await tx.ticket.updateMany({
+            where: { boardId: id },
+            data: { 
+              boardId: targetBoard.id,
+              // Reset status to OPEN when moving to preserve data integrity
+              status: 'OPEN',
+              // Reset position to avoid conflicts
+              position: 0
+            }
+          });
+          movedTicketsCount = ticketUpdateResult.count;
+          console.log(`Moved ${movedTicketsCount} tickets to board ${targetBoard.name}`);
+        }
+
+        // Move tasks to target board
+        if (boardToDelete.tasks.length > 0) {
+          const taskUpdateResult = await tx.task.updateMany({
+            where: { boardId: id },
+            data: { 
+              boardId: targetBoard.id,
+              // Reset status to TODO when moving to preserve data integrity
+              status: 'TODO',
+              // Reset position to avoid conflicts
+              position: 0
+            }
+          });
+          movedTasksCount = taskUpdateResult.count;
+          console.log(`Moved ${movedTasksCount} tasks to board ${targetBoard.name}`);
+        }
+      } else if (!preserveItems) {
+        // If not preserving items, set boardId to null (unassign)
+        if (boardToDelete.tickets.length > 0) {
+          await tx.ticket.updateMany({
+            where: { boardId: id },
+            data: { boardId: null }
+          });
+          console.log(`Unassigned ${boardToDelete.tickets.length} tickets from board`);
+        }
+
+        if (boardToDelete.tasks.length > 0) {
+          await tx.task.updateMany({
+            where: { boardId: id },
+            data: { boardId: null }
+          });
+          console.log(`Unassigned ${boardToDelete.tasks.length} tasks from board`);
+        }
+      }
+
+      // Soft delete the board (mark as inactive)
+      const deletedBoard = await tx.kanbanBoard.update({
+        where: { id },
+        data: { isActive: false }
+      });
+
+      // Also soft delete the board's columns
+      await tx.kanbanColumn.updateMany({
+        where: { boardId: id },
+        data: { isActive: false }
+      });
+
+      return {
+        deletedBoard,
+        targetBoard,
+        movedTicketsCount,
+        movedTasksCount
+      };
+    });
+
+    console.log('=== DELETE BOARD REQUEST SUCCESS ===');
+    
+    const response = {
+      message: 'Board deleted successfully',
+      deletedBoard: {
+        id: result.deletedBoard.id,
+        name: result.deletedBoard.name
+      }
+    };
+
+    if (result.targetBoard) {
+      response.itemsMovedTo = {
+        boardId: result.targetBoard.id,
+        boardName: result.targetBoard.name,
+        movedTickets: result.movedTicketsCount,
+        movedTasks: result.movedTasksCount
+      };
+    }
+
+    res.json(response);
+
+  } catch (error) {
+    console.error('=== DELETE BOARD REQUEST ERROR ===');
     console.error('Error deleting board:', error);
-    res.status(500).json({ error: 'Failed to delete board' });
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    
+    res.status(500).json({ 
+      error: 'Failed to delete board',
+      details: error.message 
+    });
   }
 };
 
 // Move ticket between columns/positions
 export const moveTicket = async (req, res) => {
-  console.log('=== MOVE TICKET REQUEST START ===');
-  console.log('Request headers:', req.headers);
-  console.log('Request params:', req.params);
-  console.log('Request body:', req.body);
-  console.log('User:', req.user);
-  console.log('Authorization header:', req.headers.authorization);
-  
+
   try {
     const { ticketId } = req.params;
     const { newStatus, newPosition, boardId } = req.body;

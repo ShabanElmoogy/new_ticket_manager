@@ -28,7 +28,7 @@ interface KanbanState {
   fetchBoard: (boardId: string) => Promise<void>;
   createBoard: (boardData: Partial<KanbanBoard>) => Promise<void>;
   updateBoard: (boardId: string, boardData: Partial<KanbanBoard>) => Promise<void>;
-  deleteBoard: (boardId: string) => Promise<void>;
+  deleteBoard: (boardId: string, options?: { preserveItems?: boolean; targetBoardId?: string }) => Promise<void>;
   
   moveTicket: (ticketId: string, newStatus: TicketStatus, newPosition: number, boardId?: string) => Promise<void>;
   
@@ -67,11 +67,14 @@ export const useKanbanStore = create<KanbanState>()(
 
       // Board actions
       fetchBoards: async () => {
+        console.log('=== KANBAN STORE fetchBoards called ===');
         set({ loading: true, error: null });
         try {
           const boards = await kanbanApi.getAllBoards();
+          console.log('=== KANBAN STORE fetchBoards result ===', boards.length, 'boards');
           set({ boards, loading: false });
         } catch (error) {
+          console.error('=== KANBAN STORE fetchBoards error ===', error);
           set({ 
             error: error instanceof Error ? error.message : 'Failed to fetch boards', 
             loading: false 
@@ -93,14 +96,33 @@ export const useKanbanStore = create<KanbanState>()(
       },
 
       createBoard: async (boardData: Partial<KanbanBoard>) => {
+        console.log('=== KANBAN STORE createBoard called ===', boardData);
         set({ loading: true, error: null });
         try {
+          // If creating a default board, check if one already exists
+          if (boardData.isDefault) {
+            const currentBoards = get().boards;
+            console.log('Checking for existing default boards, current boards:', currentBoards.length);
+            const existingDefault = currentBoards.find(board => 
+              board.isDefault && board.type === boardData.type
+            );
+            
+            if (existingDefault) {
+              console.log('Default board already exists, not creating duplicate:', existingDefault.id);
+              set({ loading: false });
+              return;
+            }
+          }
+
+          console.log('Creating board via API...');
           const newBoard = await kanbanApi.createBoard(boardData);
+          console.log('Board created successfully:', newBoard.id, newBoard.name);
           set(state => ({ 
             boards: [...state.boards, newBoard], 
             loading: false 
           }));
         } catch (error) {
+          console.error('Error in kanban store createBoard:', error);
           set({ 
             error: error instanceof Error ? error.message : 'Failed to create board', 
             loading: false 
@@ -127,20 +149,38 @@ export const useKanbanStore = create<KanbanState>()(
         }
       },
 
-      deleteBoard: async (boardId: string) => {
+      deleteBoard: async (boardId: string, options?: { preserveItems?: boolean; targetBoardId?: string }) => {
         set({ loading: true, error: null });
         try {
-          await kanbanApi.deleteBoard(boardId);
+          const result = await kanbanApi.deleteBoard(boardId, options);
+          
+          // Remove the deleted board from the boards list
           set(state => ({
             boards: state.boards.filter(board => board.id !== boardId),
             currentBoard: state.currentBoard?.id === boardId ? null : state.currentBoard,
             loading: false
           }));
+
+          // If items were moved to another board, refresh that board's data
+          if (result.itemsMovedTo && result.itemsMovedTo.boardId) {
+            const { fetchBoard } = get();
+            // Refresh the target board if it's currently selected
+            const currentBoard = get().currentBoard;
+            if (currentBoard && currentBoard.id === result.itemsMovedTo.boardId) {
+              await fetchBoard(result.itemsMovedTo.boardId);
+            }
+          }
+
+          // Refresh all boards to get updated counts
+          const { fetchBoards } = get();
+          await fetchBoards();
+
         } catch (error) {
           set({ 
             error: error instanceof Error ? error.message : 'Failed to delete board', 
             loading: false 
           });
+          throw error; // Re-throw to allow component to handle
         }
       },
 

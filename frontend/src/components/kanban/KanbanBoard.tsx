@@ -48,6 +48,7 @@ import CreateTicketDialog from "./CreateTicketDialog";
 import BoardSettingsDialog from "./BoardSettingsDialog";
 import BoardAnalyticsDialog from "./BoardAnalyticsDialog";
 import CreateBoardDialog from "./CreateBoardDialog";
+import DeleteBoardDialog from "./DeleteBoardDialog";
 
 // Import the modular board components
 import {
@@ -81,7 +82,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const { currentBoard, loading, error, fetchBoard, moveTicket, clearError } =
+  const { currentBoard, loading, error, fetchBoard, moveTicket, clearError, boards: allBoards } =
     useKanbanStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -89,6 +90,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [deleteBoardOpen, setDeleteBoardOpen] = useState(false);
 
   // Mobile-specific states
   const [activeTab, setActiveTab] = useState(0);
@@ -115,6 +117,19 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
       fetchBoard(boardId);
     }
   }, [boardId, fetchBoard]);
+
+  // Handle board deletion - redirect to another board if current board is deleted
+  useEffect(() => {
+    if (!loading && !currentBoard && boardId && allBoards.length > 0) {
+      // Check if the current boardId still exists in the boards list
+      const boardExists = allBoards.some(board => board.id === boardId);
+      if (!boardExists) {
+        // Board was deleted, redirect to the first available board
+        const firstBoard = allBoards[0];
+        handleBoardChange(firstBoard.id);
+      }
+    }
+  }, [loading, currentBoard, boardId, allBoards, handleBoardChange]);
 
   const handleDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -816,6 +831,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           onRefresh={handleRefresh}
           onSettings={() => setSettingsOpen(true)}
           onAnalytics={() => setAnalyticsOpen(true)}
+          onDelete={() => setDeleteBoardOpen(true)}
+          canDelete={currentBoard ? !currentBoard.isDefault : false}
+          isDefaultBoard={currentBoard?.isDefault || false}
         />
 
         {/* Dialogs */}
@@ -843,6 +861,28 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
           open={createBoardOpen}
           onClose={() => setCreateBoardOpen(false)}
         />
+
+        {currentBoard && (
+          <DeleteBoardDialog
+            open={deleteBoardOpen}
+            onClose={() => setDeleteBoardOpen(false)}
+            onDeleted={() => {
+              // After successful deletion, navigate to another board if available
+              if (allBoards.length > 1) {
+                const remainingBoards = allBoards.filter(board => board.id !== currentBoard.id);
+                if (remainingBoards.length > 0) {
+                  handleBoardChange(remainingBoards[0].id);
+                }
+              }
+            }}
+            boardId={currentBoard.id}
+            boardName={currentBoard.name}
+            boardType={currentBoard.type}
+            ticketCount={currentBoard.tickets?.length || 0}
+            taskCount={currentBoard.tasks?.length || 0}
+            isDefault={currentBoard.isDefault}
+          />
+        )}
       </Box>
     </LocalizationProvider>
   );
