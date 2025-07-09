@@ -383,7 +383,6 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Box
         sx={{
-          height: "100%",
           display: "flex",
           flexDirection: "column",
           backgroundColor: theme.palette.background.default,

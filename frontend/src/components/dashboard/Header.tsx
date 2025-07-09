@@ -19,6 +19,7 @@ import DesktopMenu from './header/DesktopMenu';
 import MobileDrawer from './header/MobileDrawer';
 import NotificationPopover from './header/NotificationPopover';
 import PWAInstallButton from '../pwa/PWAInstallButton';
+import LanguageSwitcher from '../common/LanguageSwitcher';
 
 const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenWhatsApp, onOpenWhatsAppUsers, onTicketClick }) => {
   const { user, logout, token } = useAuthStore();
@@ -162,6 +163,14 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
           {/* Desktop Theme Toggle */}
           {!isMobile && (
             <ThemeToggleButton mode={mode} onToggle={toggleTheme} />
+          )}
+
+          {/* Language Switcher - Desktop only, positioned after theme toggle */}
+          {!isMobile && (
+            <LanguageSwitcher 
+              variant="button" 
+              size="small"
+            />
           )}
 
           {/* Menu Button */}

@@ -12,11 +12,14 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Stack,
 } from "@mui/material";
 import {
   type MenuItem as MenuItemType,
   type UserInfo,
 } from "../../../types/header";
+import LanguageSwitcher from "../../common/LanguageSwitcher";
+import ThemeToggleButton from "./ThemeToggleButton";
 
 interface MobileDrawerProps {
   open: boolean;
@@ -41,6 +44,10 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
       .toUpperCase()
       .slice(0, 2);
   };
+
+  // Find theme toggle item and remove it from menu items since we'll show it separately
+  const filteredMenuItems = menuItems.filter(item => item.label !== "Toggle Theme");
+  const themeToggleItem = menuItems.find(item => item.label === "Toggle Theme");
 
   return (
     <Drawer
@@ -97,8 +104,75 @@ const MobileDrawer: React.FC<MobileDrawerProps> = ({
         </Box>
       </Box>
 
+      {/* Settings Section - Language and Theme */}
+      <Box sx={{ p: 3, borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}>
+        <Typography 
+          variant="subtitle2" 
+          sx={{ 
+            color: "rgba(255, 255, 255, 0.7)", 
+            mb: 2, 
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.5px"
+          }}
+        >
+          Settings
+        </Typography>
+        
+        <Stack spacing={2}>
+          {/* Language Switcher */}
+          <Box>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: "rgba(255, 255, 255, 0.8)", 
+                mb: 1,
+                fontSize: "0.8rem"
+              }}
+            >
+              Language
+            </Typography>
+            <LanguageSwitcher 
+              variant="chip" 
+              size="small"
+            />
+          </Box>
+
+          {/* Theme Toggle */}
+          <Box>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: "rgba(255, 255, 255, 0.8)", 
+                mb: 1,
+                fontSize: "0.8rem"
+              }}
+            >
+              Theme
+            </Typography>
+            <Box display="flex" alignItems="center" gap={1}>
+              <ThemeToggleButton 
+                mode={mode} 
+                onToggle={themeToggleItem?.onClick || (() => {})} 
+              />
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: "white", 
+                  fontSize: "0.875rem",
+                  textTransform: "capitalize"
+                }}
+              >
+                {mode} Mode
+              </Typography>
+            </Box>
+          </Box>
+        </Stack>
+      </Box>
+
       <List sx={{ pt: 2 }}>
-        {menuItems
+        {filteredMenuItems
           .map((item, index) => [
             item.label === "Logout" && (
               <Box key={`divider-${index}`} sx={{ mx: 2, my: 1 }}>
