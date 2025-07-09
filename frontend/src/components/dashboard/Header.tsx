@@ -1,36 +1,42 @@
 // components/Header.tsx - Main Header Component
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Box, useTheme, useMediaQuery } from '@mui/material';
-import { useAuthStore } from '../../stores/authStore';
-import { useThemeStore } from '../../stores/themeStore';
-import { apiService } from '../../services/api';
-import { type HeaderProps } from '../../types/header';
-import { useNotifications } from '../../hooks/useNotifications';
-import { createMenuItems } from '../../config/menuItems';
-import { formatNotificationTime } from '../../utils/notificationUtils';
+import React, { useState } from "react";
+import { AppBar, Toolbar, Box, useTheme, useMediaQuery } from "@mui/material";
+import { useAuthStore } from "../../stores/authStore";
+import { useThemeStore } from "../../stores/themeStore";
+import { apiService } from "../../services/api";
+import { type HeaderProps } from "../../types/header";
+import { useNotifications } from "../../hooks/useNotifications";
+import { createMenuItems } from "../../config/menuItems";
+import { formatNotificationTime } from "../../utils/notificationUtils";
 
 // Component imports
-import HeaderLogo from './header/HeaderLogo';
-import UserAvatar from './header/UserAvatar';
-import NotificationBell from './header/NotificationBell';
-import ThemeToggleButton from './header/ThemeToggleButton';
-import MenuButton from './header/MenuButton';
-import DesktopMenu from './header/DesktopMenu';
-import MobileDrawer from './header/MobileDrawer';
-import NotificationPopover from './header/NotificationPopover';
-import PWAInstallButton from '../pwa/PWAInstallButton';
-import LanguageSwitcher from '../common/LanguageSwitcher';
+import HeaderLogo from "./header/HeaderLogo";
+import UserAvatar from "./header/UserAvatar";
+import NotificationBell from "./header/NotificationBell";
+import ThemeToggleButton from "./header/ThemeToggleButton";
+import MenuButton from "./header/MenuButton";
+import DesktopMenu from "./header/DesktopMenu";
+import MobileDrawer from "./header/MobileDrawer";
+import NotificationPopover from "./header/NotificationPopover";
+import PWAInstallButton from "../pwa/PWAInstallButton";
+import LanguageSwitcher from "../common/LanguageSwitcher";
 
-const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenWhatsApp, onOpenWhatsAppUsers, onTicketClick }) => {
+const Header: React.FC<HeaderProps> = ({
+  onOpenAdminPanel,
+  onOpenKanban,
+  onTicketClick,
+  onNavigateHome, // Add this prop
+}) => {
   const { user, logout, token } = useAuthStore();
   const { mode, toggleTheme } = useThemeStore();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   // Menu states
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] =
+    useState<null | HTMLElement>(null);
 
   // Notifications hook
   const {
@@ -85,18 +91,38 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
     try {
       markNotificationAsRead(notification.id);
       handleNotificationClose();
-      
-      const fullTicket = await apiService.getTicket(token, notification.data.ticket.id);
+
+      const fullTicket = await apiService.getTicket(
+        token,
+        notification.data.ticket.id
+      );
       onTicketClick(fullTicket);
     } catch (error) {
-      console.error('Error fetching ticket details:', error);
+      console.error("Error fetching ticket details:", error);
       handleNotificationClose();
     }
   };
 
   const handleUserInfoClick = () => {
-    if (user?.role === 'ADMIN' && onOpenAdminPanel) {
+    if (user?.role === "ADMIN" && onOpenAdminPanel) {
       onOpenAdminPanel();
+    }
+  };
+
+  // Logo navigation handler
+  const handleLogoNavigation = () => {
+    console.log("Header: Logo clicked, navigating to dashboard");
+
+    // Close any open menus/popovers when navigating home
+    handleClose();
+    handleMobileMenuClose();
+    handleNotificationClose();
+
+    // Call the navigation handler passed from Dashboard
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else {
+      console.warn("onNavigateHome handler not provided to Header");
     }
   };
 
@@ -115,29 +141,36 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
   if (!user) return null;
 
   return (
-    <AppBar 
-      position="static" 
+    <AppBar
+      position="static"
       elevation={0}
       sx={{
-        background: mode === 'light' 
-          ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-          : 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-        borderBottom: mode === 'light' 
-          ? '1px solid rgba(255, 255, 255, 0.1)'
-          : '1px solid rgba(255, 255, 255, 0.05)',
+        background:
+          mode === "light"
+            ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            : "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
+        borderBottom:
+          mode === "light"
+            ? "1px solid rgba(255, 255, 255, 0.1)"
+            : "1px solid rgba(255, 255, 255, 0.05)",
       }}
     >
-      <Toolbar sx={{ 
-        minHeight: { xs: 56, sm: 64, md: 70 },
-        px: { xs: 1, sm: 2, md: 3 }
-      }}>
-        {/* Logo */}
-        <HeaderLogo mode={mode} />
-        
+      <Toolbar
+        sx={{
+          minHeight: { xs: 56, sm: 64, md: 70 },
+          px: { xs: 1, sm: 2, md: 3 },
+        }}
+      >
+        {/* Logo with Navigation */}
+        <HeaderLogo
+          mode={mode}
+          onNavigateHome={handleLogoNavigation} // Pass the navigation handler
+        />
+
         {/* Actions */}
         <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1, md: 2 }}>
           {/* User Info */}
-          <UserAvatar 
+          <UserAvatar
             user={user}
             mode={mode}
             onClick={handleUserInfoClick}
@@ -155,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
           {/* PWA Install Button */}
           <PWAInstallButton
             variant="icon"
-            size={isMobile ? 'small' : 'medium'}
+            size={isMobile ? "small" : "medium"}
             color="inherit"
             showTooltip={!isMobile}
           />
@@ -166,12 +199,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenAdminPanel, onOpenKanban, onOpenW
           )}
 
           {/* Language Switcher - Desktop only, positioned after theme toggle */}
-          {!isMobile && (
-            <LanguageSwitcher 
-              variant="button" 
-              size="small"
-            />
-          )}
+          {!isMobile && <LanguageSwitcher variant="button" size="small" />}
 
           {/* Menu Button */}
           <MenuButton

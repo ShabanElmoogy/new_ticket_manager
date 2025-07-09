@@ -2,9 +2,8 @@
 export interface HeaderProps {
   onOpenAdminPanel?: () => void;
   onOpenKanban?: () => void;
-  onOpenWhatsApp?: () => void;
-  onOpenWhatsAppUsers?: () => void;
   onTicketClick?: (ticket: any) => void;
+  onNavigateHome: () => void;
 }
 
 export interface Notification {

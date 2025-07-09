@@ -45,7 +45,7 @@ import type {
 } from "../../types/kanban";
 import KanbanColumn from "./KanbanColumn";
 import CreateTicketDialog from "./CreateTicketDialog";
-import BoardSettingsDialog from "./BoardSettingsDialog";
+import BoardSettingsDialog from "./settings/BoardSettingsDialog";
 import BoardAnalyticsDialog from "./BoardAnalyticsDialog";
 import CreateBoardDialog from "./CreateBoardDialog";
 import DeleteBoardDialog from "./DeleteBoardDialog";
@@ -82,8 +82,15 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const { currentBoard, loading, error, fetchBoard, moveTicket, clearError, boards: allBoards } =
-    useKanbanStore();
+  const {
+    currentBoard,
+    loading,
+    error,
+    fetchBoard,
+    moveTicket,
+    clearError,
+    boards: allBoards,
+  } = useKanbanStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
@@ -122,7 +129,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
   useEffect(() => {
     if (!loading && !currentBoard && boardId && allBoards.length > 0) {
       // Check if the current boardId still exists in the boards list
-      const boardExists = allBoards.some(board => board.id === boardId);
+      const boardExists = allBoards.some((board) => board.id === boardId);
       if (!boardExists) {
         // Board was deleted, redirect to the first available board
         const firstBoard = allBoards[0];
@@ -869,7 +876,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({
             onDeleted={() => {
               // After successful deletion, navigate to another board if available
               if (allBoards.length > 1) {
-                const remainingBoards = allBoards.filter(board => board.id !== currentBoard.id);
+                const remainingBoards = allBoards.filter(
+                  (board) => board.id !== currentBoard.id
+                );
                 if (remainingBoards.length > 0) {
                   handleBoardChange(remainingBoards[0].id);
                 }

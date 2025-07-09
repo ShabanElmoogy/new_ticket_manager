@@ -19,6 +19,7 @@ import BoardFilters from "./BoardFilters";
 import BoardMenu from "./BoardMenu";
 import KanbanColumn from "../KanbanColumn";
 import CreateTicketDialog from "../CreateTicketDialog";
+import CreateTaskDialog from "../CreateTaskDialog";
 import BoardSettingsDialog from "../BoardSettingsDialog";
 import BoardAnalyticsDialog from "../BoardAnalyticsDialog";
 import CreateBoardDialog from "../CreateBoardDialog";
@@ -51,6 +52,7 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
   // UI State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [createTicketOpen, setCreateTicketOpen] = useState(false);
+  const [createTaskOpen, setCreateTaskOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -108,6 +110,17 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
 
   const handleRefresh = () => {
     fetchBoard(boardId);
+  };
+
+  // Handle create ticket/task based on board type
+  const handleCreateTicketOrTask = () => {
+    if (currentBoard?.type === "TASKS") {
+      console.log("Opening CreateTaskDialog");
+      setCreateTaskOpen(true);
+    } else {
+      console.log("Opening CreateTicketDialog");
+      setCreateTicketOpen(true);
+    }
   };
 
   const getTicketsForColumn = (status: TicketStatus): KanbanTicket[] => {
@@ -397,7 +410,7 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
             hasActiveFilters={hasActiveFilters}
             onBoardChange={handleBoardChange}
             onCreateBoard={handleCreateBoard}
-            onCreateTicket={() => setCreateTicketOpen(true)}
+            onCreateTicket={handleCreateTicketOrTask}
             onToggleFilters={() => setFiltersOpen(!filtersOpen)}
             onMenuClick={handleMenuClick}
           />
@@ -507,9 +520,17 @@ const BoardContainer: React.FC<BoardContainerProps> = ({
         />
 
         {/* Dialogs */}
+        {/* Create Ticket Dialog - for TICKETS boards */}
         <CreateTicketDialog
           open={createTicketOpen}
           onClose={() => setCreateTicketOpen(false)}
+          boardId={boardId}
+        />
+
+        {/* Create Task Dialog - for TASKS boards */}
+        <CreateTaskDialog
+          open={createTaskOpen}
+          onClose={() => setCreateTaskOpen(false)}
           boardId={boardId}
         />
 

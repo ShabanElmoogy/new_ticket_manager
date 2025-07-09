@@ -5,19 +5,57 @@ import { ConfirmationNumber as TicketIcon } from "@mui/icons-material";
 
 interface HeaderLogoProps {
   mode: "light" | "dark";
+  onNavigateHome?: () => void; // Optional callback for navigation
 }
 
-const HeaderLogo: React.FC<HeaderLogoProps> = ({ mode }) => {
+const HeaderLogo: React.FC<HeaderLogoProps> = ({ mode, onNavigateHome }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const handleLogoClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    console.log("Logo clicked - navigating to dashboard");
+
+    if (onNavigateHome) {
+      onNavigateHome();
+    } else {
+      // Fallback if no handler provided
+      console.log("No navigation handler provided");
+    }
+  };
+
   return (
-    <Box display="flex" alignItems="center" sx={{ flexGrow: 1 }}>
+    <Box
+      display="flex"
+      alignItems="center"
+      onClick={handleLogoClick}
+      role="button"
+      tabIndex={0}
+      aria-label="Go to dashboard"
+      sx={{
+        flexGrow: 1,
+        cursor: "pointer",
+        transition: "all 0.3s ease",
+        outline: "none",
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleLogoClick(event as any);
+        }
+      }}
+    >
       <TicketIcon
         sx={{
           mr: { xs: 1, sm: 2 },
           fontSize: { xs: 24, sm: 26, md: 28 },
+          transition: "transform 0.3s ease",
+          "&:hover": {
+            transform: "rotate(5deg)",
+          },
         }}
       />
 
@@ -36,6 +74,17 @@ const HeaderLogo: React.FC<HeaderLogoProps> = ({ mode }) => {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           display: { xs: "none", sm: "block" },
+          transition: "all 0.3s ease",
+          userSelect: "none",
+          "&:hover": {
+            background:
+              mode === "light"
+                ? "linear-gradient(45deg, #ffffff 20%, #dbeafe 80%)"
+                : "linear-gradient(45deg, #e2e8f0 20%, #cbd5e1 80%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          },
         }}
       >
         Ticket Management
@@ -56,6 +105,17 @@ const HeaderLogo: React.FC<HeaderLogoProps> = ({ mode }) => {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           display: { xs: "block", sm: "none" },
+          transition: "all 0.3s ease",
+          userSelect: "none",
+          "&:hover": {
+            background:
+              mode === "light"
+                ? "linear-gradient(45deg, #ffffff 20%, #dbeafe 80%)"
+                : "linear-gradient(45deg, #e2e8f0 20%, #cbd5e1 80%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          },
         }}
       >
         Tickets

@@ -61,7 +61,7 @@ const Dashboard: React.FC = () => {
   const [employees, setEmployees] = useState<User[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [statusFilter, setStatusFilter] = useState("");
@@ -81,13 +81,16 @@ const Dashboard: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(false);
 
   const fetchInitialData = async () => {
-    console.log('=== fetchInitialData called ===', { token: !!token, isInitializing });
+    console.log("=== fetchInitialData called ===", {
+      token: !!token,
+      isInitializing,
+    });
     if (!token || isInitializing) return;
 
     try {
       setIsInitializing(true);
       setLoading(true);
-      console.log('Starting fetchInitialData...');
+      console.log("Starting fetchInitialData...");
       const [
         ticketsData,
         employeesData,
@@ -258,7 +261,9 @@ const Dashboard: React.FC = () => {
 
   // Initial load
   useEffect(() => {
-    console.log('=== useEffect for fetchInitialData triggered ===', { token: !!token });
+    console.log("=== useEffect for fetchInitialData triggered ===", {
+      token: !!token,
+    });
     fetchInitialData();
   }, [token]);
 
@@ -416,6 +421,14 @@ const Dashboard: React.FC = () => {
       </Box>
     );
   }
+
+  const handleNavigateHome = () => {
+    // Set current view to dashboard (same as your existing pattern)
+    setCurrentView("dashboard");
+
+    // Optional: Scroll to top when going home for better UX
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Render different views based on currentView
   const renderCurrentView = () => {
@@ -904,9 +917,8 @@ const Dashboard: React.FC = () => {
       <Header
         onOpenAdminPanel={() => setCurrentView("admin")}
         onOpenKanban={() => setCurrentView("kanban")}
-        onOpenWhatsApp={() => setCurrentView("whatsapp")}
-        onOpenWhatsAppUsers={() => setCurrentView("whatsapp-users")}
         onTicketClick={handleTicketClick}
+        onNavigateHome={handleNavigateHome}
       />
       {renderCurrentView()}
     </Box>

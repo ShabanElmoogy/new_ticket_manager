@@ -33,6 +33,9 @@ const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   boardId,
   columnId
 }) => {
+  console.log('=== DEBUG: CreateTaskDialog rendered ===');
+  console.log('CreateTaskDialog open:', open);
+  
   const { currentBoard, createTask, loading } = useKanbanStore();
   
   const [formData, setFormData] = useState({

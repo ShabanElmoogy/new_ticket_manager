@@ -114,26 +114,8 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
           width: "100%",
           boxSizing: "border-box",
           maxHeight: { xs: "25vh", sm: "30vh", md: "none" },
-          overflowY: "scroll",
+          overflowY: { xs: "scroll", md: "hidden" },
           position: "relative",
-          // Simple, visible scrollbar for mobile
-          "&::-webkit-scrollbar": {
-            width: "16px",
-          },
-          "&::-webkit-scrollbar-track": {
-            backgroundColor: "#f1f1f1",
-            borderRadius: "10px",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "#888",
-            borderRadius: "10px",
-            "&:hover": {
-              backgroundColor: "#555",
-            },
-          },
-          // Firefox scrollbar
-          scrollbarWidth: "thick",
-          scrollbarColor: "#888 #f1f1f1",
         }}
       >
         {/* Compact Header - Sticky */}
@@ -160,7 +142,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
                 sx={{ fontSize: "1rem", color: "primary.main" }}
               />
               <Typography variant="subtitle2" fontWeight={600}>
-                {tf('filters')}
+                {tf("filters")}
               </Typography>
               {activeFiltersCount > 0 && (
                 <Chip
@@ -187,7 +169,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
                   py: 0.25,
                 }}
               >
-                {tf('clearFilters')}
+                {tf("clearFilters")}
               </Button>
             )}
           </Box>
@@ -229,7 +211,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
                 <Chip
                   label={
                     assigneeFilter === "unassigned"
-                      ? tf('unassigned')
+                      ? tf("unassigned")
                       : (
                           uniqueAssignees.find((a) => a.id === assigneeFilter)
                             ?.name || assigneeFilter
@@ -244,7 +226,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
               )}
               {(dueDateFrom || dueDateTo) && (
                 <Chip
-                  label={tc('dates')}
+                  label={tc("dates")}
                   size="small"
                   onDelete={() => {
                     onDueDateFromChange(null);
@@ -257,7 +239,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
               )}
               {(estimatedHoursMin || estimatedHoursMax) && (
                 <Chip
-                  label={tc('hours')}
+                  label={tc("hours")}
                   size="small"
                   onDelete={() => {
                     onEstimatedHoursMinChange("");
@@ -278,8 +260,8 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Search */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <TextField
-                label={tf('search')}
-                placeholder={tf('search')}
+                label={tf("search")}
+                placeholder={tf("search")}
                 value={searchFilter}
                 onChange={(e) => onSearchChange(e.target.value)}
                 size="small"
@@ -297,17 +279,17 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Priority */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{tf('priority')}</InputLabel>
+                <InputLabel>{tf("priority")}</InputLabel>
                 <Select
                   value={priorityFilter}
-                  label={tf('priority')}
+                  label={tf("priority")}
                   onChange={(e) => onPriorityChange(e.target.value)}
                 >
-                  <MenuItem value="">{tf('all')}</MenuItem>
-                  <MenuItem value="LOW">🟢 {tp('low')}</MenuItem>
-                  <MenuItem value="MEDIUM">🟡 {tp('medium')}</MenuItem>
-                  <MenuItem value="HIGH">🟠 {tp('high')}</MenuItem>
-                  <MenuItem value="URGENT">🔴 {tp('urgent')}</MenuItem>
+                  <MenuItem value="">{tf("all")}</MenuItem>
+                  <MenuItem value="LOW">🟢 {tp("low")}</MenuItem>
+                  <MenuItem value="MEDIUM">🟡 {tp("medium")}</MenuItem>
+                  <MenuItem value="HIGH">🟠 {tp("high")}</MenuItem>
+                  <MenuItem value="URGENT">🔴 {tp("urgent")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -315,20 +297,20 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Assignee */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{tf('assignee')}</InputLabel>
+                <InputLabel>{tf("assignee")}</InputLabel>
                 <Select
                   value={assigneeFilter}
-                  label={tf('assignee')}
+                  label={tf("assignee")}
                   onChange={(e) => onAssigneeChange(e.target.value)}
                 >
-                  <MenuItem value="">{tf('all')}</MenuItem>
+                  <MenuItem value="">{tf("all")}</MenuItem>
                   <MenuItem value="unassigned">
                     <Box display="flex" alignItems="center" gap={1}>
                       <PersonIcon
                         sx={{ fontSize: "0.9rem" }}
                         color="disabled"
                       />
-                      {tf('unassigned')}
+                      {tf("unassigned")}
                     </Box>
                   </MenuItem>
                   {uniqueAssignees.map((assignee) => (
@@ -358,7 +340,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Due Date From */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <DatePicker
-                label={tf('dueDateFrom')}
+                label={tf("dueDateFrom")}
                 value={dueDateFrom}
                 onChange={onDueDateFromChange}
                 slotProps={{
@@ -373,7 +355,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Due Date To */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <DatePicker
-                label={tf('dueDateTo')}
+                label={tf("dueDateTo")}
                 value={dueDateTo}
                 onChange={onDueDateToChange}
                 slotProps={{
@@ -388,20 +370,20 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Customer */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{tf('customer')}</InputLabel>
+                <InputLabel>{tf("customer")}</InputLabel>
                 <Select
                   value={customerFilter}
-                  label={tf('customer')}
+                  label={tf("customer")}
                   onChange={(e) => onCustomerChange(e.target.value)}
                 >
-                  <MenuItem value="">{tf('all')}</MenuItem>
+                  <MenuItem value="">{tf("all")}</MenuItem>
                   <MenuItem value="no-customer">
                     <Box display="flex" alignItems="center" gap={1}>
                       <BusinessIcon
                         sx={{ fontSize: "0.9rem" }}
                         color="disabled"
                       />
-                      {tf('none')}
+                      {tf("none")}
                     </Box>
                   </MenuItem>
                   {uniqueCustomers.map((customer) => (
@@ -431,17 +413,17 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Application */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{tf('application')}</InputLabel>
+                <InputLabel>{tf("application")}</InputLabel>
                 <Select
                   value={applicationFilter}
-                  label={tf('application')}
+                  label={tf("application")}
                   onChange={(e) => onApplicationChange(e.target.value)}
                 >
-                  <MenuItem value="">{tf('all')}</MenuItem>
+                  <MenuItem value="">{tf("all")}</MenuItem>
                   <MenuItem value="no-application">
                     <Box display="flex" alignItems="center" gap={1}>
                       <AppsIcon sx={{ fontSize: "0.9rem" }} color="disabled" />
-                      {tf('none')}
+                      {tf("none")}
                     </Box>
                   </MenuItem>
                   {uniqueApplications.map((application) => (
@@ -468,13 +450,13 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Created By */}
             <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{tf('creator')}</InputLabel>
+                <InputLabel>{tf("creator")}</InputLabel>
                 <Select
                   value={createdByFilter}
-                  label={tf('creator')}
+                  label={tf("creator")}
                   onChange={(e) => onCreatedByChange(e.target.value)}
                 >
-                  <MenuItem value="">{tf('all')}</MenuItem>
+                  <MenuItem value="">{tf("all")}</MenuItem>
                   {uniqueCreators.map((creator) => (
                     <MenuItem key={creator.id} value={creator.id}>
                       <Box display="flex" alignItems="center" gap={1}>
@@ -502,7 +484,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Hours Min */}
             <Grid size={{ xs: 6, sm: 6, md: 3, lg: 2 }}>
               <TextField
-                label={tf('minHours')}
+                label={tf("minHours")}
                 type="number"
                 value={estimatedHoursMin}
                 onChange={(e) =>
@@ -519,7 +501,7 @@ const BoardFilters: React.FC<BoardFiltersProps> = ({
             {/* Hours Max */}
             <Grid size={{ xs: 6, sm: 6, md: 3, lg: 2 }}>
               <TextField
-                label={tf('maxHours')}
+                label={tf("maxHours")}
                 type="number"
                 value={estimatedHoursMax}
                 onChange={(e) =>
