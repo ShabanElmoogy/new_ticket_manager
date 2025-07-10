@@ -71,9 +71,6 @@ const MyCard: React.FC<EnhancedCardProps> = ({
   subtitle,
   headerIcon = <StarIcon />,
   showWelcome = true,
-  showProgress = false,
-  progressValue = 0,
-  progressMax = 100,
   helpTooltip = "Need help?",
   onHelpClick,
   elevation = 0,
@@ -322,39 +319,6 @@ const MyCard: React.FC<EnhancedCardProps> = ({
             )}
           </Box>
 
-          {/* Progress Indicator */}
-          {showProgress && (
-            <Fade in={progressValue > 0}>
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
-                <Box
-                  sx={{
-                    flex: 1,
-                    height: 3,
-                    backgroundColor: alpha(theme.palette.divider, 0.2),
-                    borderRadius: 2,
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: `${Math.min(
-                        (progressValue / progressMax) * 100,
-                        100
-                      )}%`,
-                      height: "100%",
-                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      borderRadius: 2,
-                      transition: "width 0.3s ease",
-                    }}
-                  />
-                </Box>
-                <Typography variant="caption" color="text.secondary">
-                  {progressValue}/{progressMax}
-                </Typography>
-              </Box>
-            </Fade>
-          )}
-
           <Typography
             variant="subtitle2"
             fontWeight={600}
@@ -366,10 +330,14 @@ const MyCard: React.FC<EnhancedCardProps> = ({
               gap: 1,
             }}
           >
-            <AutoAwesomeIcon
-              sx={{ fontSize: "1rem", color: theme.palette.primary.main }}
-            />
-            {inputTitle}
+            {inputTitle && inputTitle.length > 0 && (
+              <>
+                <AutoAwesomeIcon
+                  sx={{ fontSize: "1rem", color: theme.palette.primary.main }}
+                />
+                {inputTitle}
+              </>
+            )}
           </Typography>
           {/* Card Content */}
           {children}

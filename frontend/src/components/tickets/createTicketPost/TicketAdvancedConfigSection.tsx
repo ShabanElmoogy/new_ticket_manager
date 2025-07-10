@@ -1,16 +1,11 @@
 import React from "react";
 import {
   Box,
-  Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  TextField,
   Avatar,
-  Collapse,
-  Paper,
-  useTheme,
 } from "@mui/material";
 import {
   Person as PersonIcon,
@@ -20,13 +15,11 @@ import {
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { alpha } from "@mui/material/styles";
 import type { User, Customer, Application } from "./types";
 import MyTextField from "../../common/MyTextField";
 import MyCard from "../../common/MyCard";
 
 interface TicketAdvancedConfigSectionProps {
-  showAdvanced: boolean;
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   onPriorityChange: (priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT") => void;
   assignedTo: string;
@@ -47,7 +40,6 @@ interface TicketAdvancedConfigSectionProps {
 const TicketAdvancedConfigSection: React.FC<
   TicketAdvancedConfigSectionProps
 > = ({
-  showAdvanced,
   priority,
   onPriorityChange,
   assignedTo,
@@ -64,8 +56,6 @@ const TicketAdvancedConfigSection: React.FC<
   customers,
   applications,
 }) => {
-  const theme = useTheme();
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -76,22 +66,9 @@ const TicketAdvancedConfigSection: React.FC<
   };
 
   return (
-    <Collapse in={showAdvanced}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          mb: 3,
-          borderRadius: 3,
-          backgroundColor: alpha(theme.palette.background.paper, 0.8),
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-        }}
-      >
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
-          Advanced Configuration
-        </Typography>
-
-        {/* First Row - Basic Options */}
+    <>
+      {/* First Row - Basic Options */}
+      <MyCard title="Basic Options">
         <Box display="flex" gap={2} mb={3} flexWrap="wrap">
           <FormControl size="small" sx={{ minWidth: 140 }}>
             <InputLabel>Priority</InputLabel>
@@ -197,10 +174,7 @@ const TicketAdvancedConfigSection: React.FC<
               ))}
             </Select>
           </FormControl>
-        </Box>
 
-        {/* Second Row - Date and Time */}
-        <Box display="flex" gap={2} mb={3} flexWrap="wrap">
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Due Date"
@@ -222,8 +196,8 @@ const TicketAdvancedConfigSection: React.FC<
             onChange={(e) => onEstimatedHoursChange(e.target.value)}
           />
         </Box>
-      </Paper>
-    </Collapse>
+      </MyCard>
+    </>
   );
 };
 

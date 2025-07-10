@@ -22,7 +22,6 @@ import type { Label } from "../../../types/kanban";
 // Import all section components
 import TicketHeaderSection from "./TicketHeaderSection";
 import TicketDescriptionSection from "./TicketDescriptionSection";
-import TicketStatusChipsSection from "./TicketStatusChipsSection";
 import TicketAdvancedConfigSection from "./TicketAdvancedConfigSection";
 import TicketLabelsSection from "./TicketLabelsSection";
 import TicketSubmitSection from "./TicketSubmitSection";
@@ -56,7 +55,6 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [estimatedHours, setEstimatedHours] = useState("");
   const [selectedLabels, setSelectedLabels] = useState<Label[]>([]);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [labelsLoading, setLabelsLoading] = useState(false);
   const [showLabelSelector, setShowLabelSelector] = useState(false);
@@ -77,7 +75,7 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
       }
     };
     loadLabels();
-  }, [fetchLabels, createLabel, labels]);
+  }, [fetchLabels, createLabel]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +105,6 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
       setDueDate(null);
       setEstimatedHours("");
       setSelectedLabels([]);
-      setShowAdvanced(false);
       setShowLabelSelector(false);
     } finally {
       setIsPosting(false);
@@ -159,22 +156,8 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
         {/* Quick Actions & Status */}
         <Collapse in={title.length > 0}>
           <Fade in={title.length > 0}>
-            <Box sx={{ ml: 8 }}>
-              {/* Quick Status Bar */}
-              <TicketStatusChipsSection
-                showAdvanced={showAdvanced}
-                onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
-                priority={priority}
-                assignedTo={assignedTo}
-                dueDate={dueDate}
-                estimatedHours={estimatedHours}
-                selectedLabels={selectedLabels}
-                employees={employees}
-              />
-
-              {/* Advanced Options */}
+            <Box>
               <TicketAdvancedConfigSection
-                showAdvanced={showAdvanced}
                 priority={priority}
                 onPriorityChange={setPriority}
                 assignedTo={assignedTo}
@@ -191,32 +174,17 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
                 customers={customers}
                 applications={applications}
               />
-
-              {/* Labels Section */}
-              <Collapse in={showAdvanced}>
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    mb: 3,
-                    borderRadius: 3,
-                    backgroundColor: alpha(theme.palette.background.paper, 0.8),
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  }}
-                >
-                  <TicketLabelsSection
-                    selectedLabels={selectedLabels}
-                    labels={labels}
-                    labelsLoading={labelsLoading}
-                    showLabelSelector={showLabelSelector}
-                    onToggleLabelSelector={() =>
-                      setShowLabelSelector(!showLabelSelector)
-                    }
-                    onLabelToggle={handleLabelToggle}
-                  />
-                </Paper>
-              </Collapse>
-
+              {/* Labels Section - Now opens directly */}
+              <TicketLabelsSection
+                selectedLabels={selectedLabels}
+                labels={labels}
+                labelsLoading={labelsLoading}
+                showLabelSelector={showLabelSelector}
+                onToggleLabelSelector={() =>
+                  setShowLabelSelector(!showLabelSelector)
+                }
+                onLabelToggle={handleLabelToggle}
+              />
               {/* Submit Section */}
               <TicketSubmitSection
                 title={title}
