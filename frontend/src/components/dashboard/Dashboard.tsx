@@ -81,16 +81,13 @@ const Dashboard: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(false);
 
   const fetchInitialData = async () => {
-    console.log("=== fetchInitialData called ===", {
-      token: !!token,
-      isInitializing,
-    });
+    
     if (!token || isInitializing) return;
 
     try {
       setIsInitializing(true);
       setLoading(true);
-      console.log("Starting fetchInitialData...");
+      
       const [
         ticketsData,
         employeesData,
@@ -261,9 +258,7 @@ const Dashboard: React.FC = () => {
 
   // Initial load
   useEffect(() => {
-    console.log("=== useEffect for fetchInitialData triggered ===", {
-      token: !!token,
-    });
+    
     fetchInitialData();
   }, [token]);
 
