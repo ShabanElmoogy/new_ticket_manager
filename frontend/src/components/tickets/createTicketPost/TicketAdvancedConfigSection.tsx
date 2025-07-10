@@ -22,6 +22,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { alpha } from "@mui/material/styles";
 import type { User, Customer, Application } from "./types";
+import MyTextField from "../../common/MyTextField";
+import MyCard from "../../common/MyCard";
 
 interface TicketAdvancedConfigSectionProps {
   showAdvanced: boolean;
@@ -207,30 +209,17 @@ const TicketAdvancedConfigSection: React.FC<
               slotProps={{
                 textField: {
                   size: "small",
-                  sx: {
-                    minWidth: 180,
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                    },
-                  },
                 },
               }}
             />
           </LocalizationProvider>
 
-          <TextField
+          <MyTextField
             label="Estimated Hours"
             type="number"
             size="small"
             value={estimatedHours}
             onChange={(e) => onEstimatedHoursChange(e.target.value)}
-            inputProps={{ min: 0, step: 0.5 }}
-            sx={{
-              minWidth: 160,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-              },
-            }}
           />
         </Box>
       </Paper>

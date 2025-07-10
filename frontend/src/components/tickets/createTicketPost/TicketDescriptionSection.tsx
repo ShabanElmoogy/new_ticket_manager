@@ -1,6 +1,5 @@
 import React from "react";
-import { Collapse, Fade, useTheme, Box } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { Collapse, Fade, Box } from "@mui/material";
 import MyTextField from "../../common/MyTextField";
 import MyCard from "../../common/MyCard";
 
@@ -14,8 +13,6 @@ const TicketDescriptionSection: React.FC<TicketDescriptionSectionProps> = ({
   description,
   onDescriptionChange,
 }) => {
-  const theme = useTheme();
-
   return (
     <Collapse in={title.length > 0}>
       <Fade in={title.length > 0}>
@@ -29,26 +26,6 @@ const TicketDescriptionSection: React.FC<TicketDescriptionSectionProps> = ({
               value={description}
               onChange={(e) => onDescriptionChange(e.target.value)}
               rounded
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 3,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-1px)",
-                    boxShadow: `0 4px 12px ${alpha(
-                      theme.palette.primary.main,
-                      0.15
-                    )}`,
-                  },
-                  "&.Mui-focused": {
-                    transform: "translateY(-1px)",
-                    boxShadow: `0 4px 12px ${alpha(
-                      theme.palette.primary.main,
-                      0.25
-                    )}`,
-                  },
-                },
-              }}
             />
           </MyCard>
         </Box>

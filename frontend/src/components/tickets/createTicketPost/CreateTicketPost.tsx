@@ -161,27 +161,16 @@ const CreateTicketPost: React.FC<CreateTicketPostProps> = ({
           <Fade in={title.length > 0}>
             <Box sx={{ ml: 8 }}>
               {/* Quick Status Bar */}
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  mb: 3,
-                  borderRadius: 3,
-                  backgroundColor: alpha(theme.palette.background.default, 0.5),
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                }}
-              >
-                <TicketStatusChipsSection
-                  showAdvanced={showAdvanced}
-                  onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
-                  priority={priority}
-                  assignedTo={assignedTo}
-                  dueDate={dueDate}
-                  estimatedHours={estimatedHours}
-                  selectedLabels={selectedLabels}
-                  employees={employees}
-                />
-              </Paper>
+              <TicketStatusChipsSection
+                showAdvanced={showAdvanced}
+                onToggleAdvanced={() => setShowAdvanced(!showAdvanced)}
+                priority={priority}
+                assignedTo={assignedTo}
+                dueDate={dueDate}
+                estimatedHours={estimatedHours}
+                selectedLabels={selectedLabels}
+                employees={employees}
+              />
 
               {/* Advanced Options */}
               <TicketAdvancedConfigSection

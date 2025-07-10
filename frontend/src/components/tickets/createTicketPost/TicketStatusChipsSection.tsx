@@ -5,6 +5,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 import type { User, Label } from "./types";
+import MyCard from "../../common/MyCard";
 
 interface TicketStatusChipsSectionProps {
   showAdvanced: boolean;
@@ -22,28 +23,30 @@ const TicketStatusChipsSection: React.FC<TicketStatusChipsSectionProps> = ({
   onToggleAdvanced,
 }) => {
   return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      mb={2}
-    >
-      <Typography variant="subtitle2" fontWeight={600}>
-        Ticket Configuration
-      </Typography>
-      <Button
-        startIcon={showAdvanced ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        onClick={onToggleAdvanced}
-        size="small"
-        sx={{
-          borderRadius: 2,
-          textTransform: "none",
-          fontWeight: 500,
-        }}
+    <MyCard headerIcon="">
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={2}
       >
-        {showAdvanced ? "Hide Options" : "More Options"}
-      </Button>
-    </Box>
+        <Typography variant="subtitle2" fontWeight={600}>
+          Ticket Configuration
+        </Typography>
+        <Button
+          startIcon={showAdvanced ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          onClick={onToggleAdvanced}
+          size="small"
+          sx={{
+            borderRadius: 2,
+            textTransform: "none",
+            fontWeight: 500,
+          }}
+        >
+          {showAdvanced ? "Hide Options" : "More Options"}
+        </Button>
+      </Box>
+    </MyCard>
   );
 };
 
