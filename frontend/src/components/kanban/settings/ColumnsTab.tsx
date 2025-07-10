@@ -23,6 +23,7 @@ import { ColumnCard } from "./ColumnCard";
 import { ColorPicker } from "./ColorPicker";
 import type { KanbanBoard, KanbanColumn } from "../../../types/kanban";
 import type { ColumnForm } from "../../../types/BoardSettings";
+import MyTextField from "../../common/MyTextField";
 
 interface ColumnsTabProps {
   board: KanbanBoard;
@@ -47,7 +48,6 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
   columnForm,
   setColumnForm,
   colorPickerAnchor,
-  setColorPickerAnchor,
   loading,
   onEditColumn,
   onDeleteColumn,
@@ -68,29 +68,42 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
   // Calculate card count for a column
   const getCardCountForColumn = (column: KanbanColumn): number => {
     if (!board) return 0;
-    
+
     // For TASKS boards, count tasks in this column
     if (board.type === "TASKS") {
-      return board.tasks?.filter(task => task.columnId === column.id).length || 0;
+      return (
+        board.tasks?.filter((task) => task.columnId === column.id).length || 0
+      );
     }
-    
+
     // For TICKETS boards, count tickets with matching status
     // Map column name to ticket status
     const columnNameUpper = column.name.toUpperCase().replace(/\s+/g, "_");
     let status = columnNameUpper;
-    
+
     // Handle common column name mappings
-    if (column.name.toLowerCase().includes("todo") || column.name.toLowerCase().includes("open")) {
+    if (
+      column.name.toLowerCase().includes("todo") ||
+      column.name.toLowerCase().includes("open")
+    ) {
       status = "OPEN";
     } else if (column.name.toLowerCase().includes("progress")) {
       status = "IN_PROGRESS";
-    } else if (column.name.toLowerCase().includes("review") || column.name.toLowerCase().includes("resolved")) {
+    } else if (
+      column.name.toLowerCase().includes("review") ||
+      column.name.toLowerCase().includes("resolved")
+    ) {
       status = "RESOLVED";
-    } else if (column.name.toLowerCase().includes("done") || column.name.toLowerCase().includes("closed")) {
+    } else if (
+      column.name.toLowerCase().includes("done") ||
+      column.name.toLowerCase().includes("closed")
+    ) {
       status = "CLOSED";
     }
-    
-    return board.tickets?.filter(ticket => ticket.status === status).length || 0;
+
+    return (
+      board.tickets?.filter((ticket) => ticket.status === status).length || 0
+    );
   };
 
   return (
@@ -223,7 +236,7 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
                 </Typography>
 
                 <Stack spacing={3}>
-                  <TextField
+                  <MyTextField
                     label="Column Name"
                     fullWidth
                     value={columnForm.name}
@@ -233,14 +246,9 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
                         name: e.target.value,
                       }))
                     }
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                      },
-                    }}
                   />
 
-                  <TextField
+                  <MyTextField
                     label="WIP Limit (Optional)"
                     type="number"
                     fullWidth
@@ -251,16 +259,10 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
                         wipLimit: e.target.value,
                       }))
                     }
-                    inputProps={{ min: 0 }}
                     helperText="Set a limit to prevent column overload"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                      },
-                    }}
                   />
 
-                  <TextField
+                  <MyTextField
                     label="Description"
                     fullWidth
                     multiline
@@ -272,11 +274,6 @@ export const ColumnsTab: React.FC<ColumnsTabProps> = ({
                         description: e.target.value,
                       }))
                     }
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: 3,
-                      },
-                    }}
                   />
 
                   <Box>

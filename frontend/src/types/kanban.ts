@@ -184,5 +184,23 @@ export interface BoardAnalytics {
   completionRate: number;
 }
 
+// Types for creating new boards and columns
+export interface CreateColumnData {
+  name: string;
+  description?: string;
+  color?: string;
+  darkColor?: string;
+  position: number;
+  wipLimit?: number;
+}
+
+export interface CreateBoardData {
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  type: BoardType;
+  columns: CreateColumnData[];
+}
+
 // DragResult is imported from @hello-pangea/dnd
 // No need to define it here

@@ -50,13 +50,15 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         vertical: "top",
         horizontal: "center",
       }}
-      PaperProps={{
-        sx: {
-          borderRadius: 4,
-          boxShadow: theme.shadows[16],
-          p: 4,
-          maxWidth: 360,
-          background: theme.palette.background.paper,
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 4,
+            boxShadow: theme.shadows[16],
+            p: 4,
+            maxWidth: 360,
+            background: theme.palette.background.paper,
+          },
         },
       }}
     >

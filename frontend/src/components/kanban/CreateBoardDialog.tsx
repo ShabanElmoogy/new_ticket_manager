@@ -19,6 +19,7 @@ import {
 import { CheckCircle as CheckCircleIcon } from "@mui/icons-material";
 import { useKanbanStore } from "../../stores/kanbanStore";
 import { getColorPair } from "../../utils/colorContrast";
+import type { KanbanBoard } from "../../types/kanban";
 
 // Import all components
 import { ProgressHeader } from "./createBoardDialogue/ProgressHeader";
@@ -63,7 +64,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
     name: "",
     description: "",
     isDefault: false,
-    type: "tickets",
+    type: "TICKETS",
   });
 
   const [columns, setColumns] = useState<ColumnData[]>(() => {
@@ -241,7 +242,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
     setError(null);
 
     try {
-      const boardData = {
+      const boardData: Partial<KanbanBoard> = {
         name: formData.name,
         description: formData.description,
         isDefault: formData.isDefault,
@@ -253,7 +254,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
           darkColor: col.darkColor,
           position: index,
           wipLimit: col.wipLimit ? parseInt(col.wipLimit) : undefined,
-        })),
+        })) as any, // Type assertion to bypass the strict typing for creation
       };
 
       await createBoard(boardData);
@@ -271,7 +272,7 @@ const CreateBoardDialog: React.FC<CreateBoardDialogProps> = ({
       name: "",
       description: "",
       isDefault: false,
-      type: "tickets",
+      type: "TICKETS",
     });
     setColumns(
       BOARD_TEMPLATES.kanban.columns.map((col) => ({

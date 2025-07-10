@@ -8,10 +8,6 @@ import {
   TextField,
   Box,
   Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Chip,
   Alert,
@@ -22,23 +18,17 @@ import {
   Card,
   CardContent,
   Avatar,
-  Divider,
   Switch,
   FormControlLabel,
   Tooltip,
-  Fade,
   Paper,
   Stack,
   useTheme,
   alpha,
   Slide,
   Collapse,
-  MenuList,
-  MenuItem,
-  ListItemIcon,
   Badge,
   LinearProgress,
-  Skeleton,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -106,14 +96,17 @@ const StatCard: React.FC<{
   trend?: number;
 }> = ({ title, value, icon, color, subtitle, trend }) => {
   const theme = useTheme();
-  
+
   return (
     <Card
       sx={{
         position: "relative",
         overflow: "hidden",
         borderRadius: 3,
-        background: `linear-gradient(135deg, ${alpha(color, 0.1)} 0%, ${alpha(color, 0.05)} 100%)`,
+        background: `linear-gradient(135deg, ${alpha(color, 0.1)} 0%, ${alpha(
+          color,
+          0.05
+        )} 100%)`,
         border: `1px solid ${alpha(color, 0.2)}`,
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
@@ -124,7 +117,11 @@ const StatCard: React.FC<{
       }}
     >
       <CardContent sx={{ p: 3 }}>
-        <Box display="flex" alignItems="flex-start" justifyContent="space-between">
+        <Box
+          display="flex"
+          alignItems="flex-start"
+          justifyContent="space-between"
+        >
           <Box>
             <Typography
               variant="h3"
@@ -163,7 +160,8 @@ const StatCard: React.FC<{
                   color={trend > 0 ? "success.main" : "error.main"}
                   fontWeight={600}
                 >
-                  {trend > 0 ? "+" : ""}{trend}%
+                  {trend > 0 ? "+" : ""}
+                  {trend}%
                 </Typography>
               </Box>
             )}
@@ -198,10 +196,10 @@ const ColumnCard: React.FC<{
       sx={{
         mb: 2,
         borderRadius: 3,
-        background: `linear-gradient(135deg, ${alpha(column.color || "#e3f2fd", 0.08)} 0%, ${alpha(
+        background: `linear-gradient(135deg, ${alpha(
           column.color || "#e3f2fd",
-          0.03
-        )} 100%)`,
+          0.08
+        )} 0%, ${alpha(column.color || "#e3f2fd", 0.03)} 100%)`,
         border: `2px solid ${alpha(column.color || "#e3f2fd", 0.2)}`,
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         "&:hover": {
@@ -221,10 +219,9 @@ const ColumnCard: React.FC<{
               width: 48,
               height: 48,
               borderRadius: 3,
-              background: `linear-gradient(135deg, ${column.color || "#e3f2fd"} 0%, ${alpha(
-                column.color || "#e3f2fd",
-                0.8
-              )} 100%)`,
+              background: `linear-gradient(135deg, ${
+                column.color || "#e3f2fd"
+              } 0%, ${alpha(column.color || "#e3f2fd", 0.8)} 100%)`,
               boxShadow: `0 4px 12px ${alpha(column.color || "#e3f2fd", 0.3)}`,
               color: "white",
               fontSize: "1.2rem",
@@ -235,7 +232,12 @@ const ColumnCard: React.FC<{
           </Box>
 
           <Box flex={1}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mb={1}
+            >
               <Typography variant="h6" fontWeight={700} color="text.primary">
                 {column.name}
               </Typography>
@@ -246,7 +248,9 @@ const ColumnCard: React.FC<{
                   onClick={() => setShowActions(!showActions)}
                   sx={{
                     color: "text.secondary",
-                    "&:hover": { backgroundColor: alpha(theme.palette.primary.main, 0.1) },
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    },
                   }}
                 >
                   <MoreVertIcon />
@@ -282,7 +286,9 @@ const ColumnCard: React.FC<{
                   label={`WIP: ${column.wipLimit}`}
                   size="small"
                   color={
-                    (column.cards?.length || 0) > column.wipLimit ? "error" : "success"
+                    (column.cards?.length || 0) > column.wipLimit
+                      ? "error"
+                      : "success"
                   }
                   variant="filled"
                   sx={{ fontWeight: 600 }}
@@ -298,7 +304,11 @@ const ColumnCard: React.FC<{
             </Box>
 
             <Collapse in={showActions}>
-              <Box mt={2} pt={2} borderTop={`1px solid ${theme.palette.divider}`}>
+              <Box
+                mt={2}
+                pt={2}
+                borderTop={`1px solid ${theme.palette.divider}`}
+              >
                 <Stack direction="row" spacing={1}>
                   <Button
                     size="small"
@@ -442,7 +452,10 @@ const UserCard: React.FC<{
                   backgroundColor: alpha(getRoleColor(permission.role), 0.1),
                   color: getRoleColor(permission.role),
                   fontWeight: 600,
-                  border: `1px solid ${alpha(getRoleColor(permission.role), 0.3)}`,
+                  border: `1px solid ${alpha(
+                    getRoleColor(permission.role),
+                    0.3
+                  )}`,
                 }}
               />
               <Typography variant="caption" color="text.disabled">
@@ -692,7 +705,8 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><defs><pattern id=\"grain\" width=\"100\" height=\"100\" patternUnits=\"userSpaceOnUse\"><circle cx=\"25\" cy=\"25\" r=\"1\" fill=\"%23ffffff\" opacity=\"0.1\"/><circle cx=\"75\" cy=\"75\" r=\"1\" fill=\"%23ffffff\" opacity=\"0.1\"/></pattern></defs><rect width=\"100\" height=\"100\" fill=\"url(%23grain)\"/></svg>')",
+            background:
+              'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>\')',
             opacity: 0.1,
           },
         }}
@@ -801,14 +815,14 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
           <Box sx={{ px: 3 }}>
             <Grid container spacing={4}>
               {/* Board Information */}
-              <Grid item xs={12} lg={8}>
+              <Grid size={{ xs: 12, lg: 6 }}>
                 <Card
                   sx={{
                     borderRadius: 4,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.03)} 0%, ${alpha(
-                      theme.palette.secondary.main,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.primary.main,
                       0.03
-                    )} 100%)`,
+                    )} 0%, ${alpha(theme.palette.secondary.main, 0.03)} 100%)`,
                     border: `1px solid ${theme.palette.divider}`,
                   }}
                 >
@@ -829,7 +843,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                     </Typography>
 
                     <Grid container spacing={3}>
-                      <Grid item xs={12}>
+                      <Grid size={{ xs: 12 }}>
                         <TextField
                           label="Board Name"
                           fullWidth
@@ -845,7 +859,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={{ xs: 12 }}>
                         <TextField
                           label="Description"
                           fullWidth
@@ -861,7 +875,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={{ xs: 12 }}>
                         <FormControlLabel
                           control={
                             <Switch
@@ -879,7 +893,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                             </Box>
                           }
                         />
-                        <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          display="block"
+                          mt={1}
+                        >
                           {isPublic
                             ? "Anyone with the link can view this board"
                             : "Only team members can access this board"}
@@ -891,7 +910,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
               </Grid>
 
               {/* Statistics */}
-              <Grid item xs={12} lg={4}>
+              <Grid size={{ xs: 12, lg: 4 }}>
                 <Stack spacing={3}>
                   <StatCard
                     title="Columns"
@@ -926,7 +945,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
               </Grid>
 
               {/* Recent Activity */}
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Card
                   sx={{
                     borderRadius: 4,
@@ -970,13 +989,19 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           </Avatar>
                           <Box flex={1}>
                             <Typography variant="body2" fontWeight={500}>
-                              John Doe moved "Design Review" from "In Progress" to "Done"
+                              John Doe moved "Design Review" from "In Progress"
+                              to "Done"
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               2 hours ago
                             </Typography>
                           </Box>
-                          <CheckCircleIcon sx={{ color: "success.main", fontSize: 20 }} />
+                          <CheckCircleIcon
+                            sx={{ color: "success.main", fontSize: 20 }}
+                          />
                         </Box>
                       ))}
                     </Box>
@@ -990,7 +1015,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
         {/* Columns Tab */}
         <TabPanel value={tabValue} index={1}>
           <Box sx={{ px: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={4}
+            >
               <Box>
                 <Typography variant="h5" fontWeight={700} gutterBottom>
                   Workflow Columns
@@ -1021,7 +1051,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
             </Box>
 
             <Grid container spacing={4}>
-              <Grid item xs={12} lg={editingColumn ? 6 : 12}>
+              <Grid size={{ xs: 12, lg: editingColumn ? 6 : 12 }}>
                 {board.columns && board.columns.length > 0 ? (
                   <Stack spacing={2}>
                     {board.columns.map((column) => (
@@ -1052,11 +1082,17 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                           mb: 2,
                         }}
                       />
-                      <Typography variant="h5" fontWeight={600} gutterBottom color="text.secondary">
+                      <Typography
+                        variant="h5"
+                        fontWeight={600}
+                        gutterBottom
+                        color="text.secondary"
+                      >
                         No columns yet
                       </Typography>
                       <Typography variant="body1" color="text.secondary" mb={3}>
-                        Create your first column to start organizing your workflow
+                        Create your first column to start organizing your
+                        workflow
                       </Typography>
                       <Button
                         startIcon={<AddIcon />}
@@ -1072,15 +1108,15 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
 
               {/* Column Edit Form */}
               {editingColumn && (
-                <Grid item xs={12} lg={6}>
+                <Grid size={{ xs: 12, lg: 6 }}>
                   <Card
                     sx={{
                       borderRadius: 4,
                       border: `2px solid ${theme.palette.primary.main}`,
-                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(
+                      background: `linear-gradient(135deg, ${alpha(
                         theme.palette.primary.main,
-                        0.02
-                      )} 100%)`,
+                        0.05
+                      )} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
                       position: "sticky",
                       top: 24,
                     }}
@@ -1102,7 +1138,8 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                       </Typography>
 
                       <Typography variant="body2" color="text.secondary" mb={4}>
-                        Customize the appearance and behavior of "{editingColumn.name}"
+                        Customize the appearance and behavior of "
+                        {editingColumn.name}"
                       </Typography>
 
                       <Stack spacing={3}>
@@ -1163,7 +1200,11 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                         />
 
                         <Box>
-                          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={600}
+                            gutterBottom
+                          >
                             Column Color
                           </Typography>
                           <Paper
@@ -1226,8 +1267,14 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                               </Typography>
                             </Box>
                           </Paper>
-                          <Typography variant="caption" color="text.secondary" display="block" mt={1}>
-                            Click to customize colors. Dark mode color is auto-generated.
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            display="block"
+                            mt={1}
+                          >
+                            Click to customize colors. Dark mode color is
+                            auto-generated.
                           </Typography>
                         </Box>
 
@@ -1270,7 +1317,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
         {/* Team Tab */}
         <TabPanel value={tabValue} index={2}>
           <Box sx={{ px: 3 }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={4}
+            >
               <Box>
                 <Typography variant="h5" fontWeight={700} gutterBottom>
                   Team Members
@@ -1303,7 +1355,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
             {board.permissions && board.permissions.length > 0 ? (
               <Grid container spacing={3}>
                 {board.permissions.map((permission) => (
-                  <Grid item xs={12} md={6} lg={4} key={permission.id}>
+                  <Grid size={{ xs: 12, md: 6, lg: 4 }} key={permission.id}>
                     <UserCard permission={permission} />
                   </Grid>
                 ))}
@@ -1326,7 +1378,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                       mb: 2,
                     }}
                   />
-                  <Typography variant="h5" fontWeight={600} gutterBottom color="text.secondary">
+                  <Typography
+                    variant="h5"
+                    fontWeight={600}
+                    gutterBottom
+                    color="text.secondary"
+                  >
                     No team members yet
                   </Typography>
                   <Typography variant="body1" color="text.secondary" mb={3}>
@@ -1368,12 +1425,15 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                   Permission Roles
                 </Typography>
                 <Grid container spacing={3} mt={1}>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box
                       sx={{
                         p: 3,
                         borderRadius: 3,
-                        border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+                        border: `1px solid ${alpha(
+                          theme.palette.error.main,
+                          0.2
+                        )}`,
                         backgroundColor: alpha(theme.palette.error.main, 0.05),
                       }}
                     >
@@ -1384,17 +1444,24 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Full access to board settings, can manage members and delete the board
+                        Full access to board settings, can manage members and
+                        delete the board
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box
                       sx={{
                         p: 3,
                         borderRadius: 3,
-                        border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
-                        backgroundColor: alpha(theme.palette.warning.main, 0.05),
+                        border: `1px solid ${alpha(
+                          theme.palette.warning.main,
+                          0.2
+                        )}`,
+                        backgroundColor: alpha(
+                          theme.palette.warning.main,
+                          0.05
+                        ),
                       }}
                     >
                       <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -1404,16 +1471,20 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Can create, edit, and move cards. Can modify column settings
+                        Can create, edit, and move cards. Can modify column
+                        settings
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box
                       sx={{
                         p: 3,
                         borderRadius: 3,
-                        border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                        border: `1px solid ${alpha(
+                          theme.palette.info.main,
+                          0.2
+                        )}`,
                         backgroundColor: alpha(theme.palette.info.main, 0.05),
                       }}
                     >
@@ -1424,7 +1495,8 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                         </Typography>
                       </Box>
                       <Typography variant="body2" color="text.secondary">
-                        Read-only access. Can view cards and comments but cannot make changes
+                        Read-only access. Can view cards and comments but cannot
+                        make changes
                       </Typography>
                     </Box>
                   </Grid>
@@ -1473,7 +1545,8 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
               Color Picker
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-              Choose a color for light mode. Dark mode variant will be automatically generated.
+              Choose a color for light mode. Dark mode variant will be
+              automatically generated.
             </Typography>
 
             <Box
@@ -1514,7 +1587,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
             </Box>
 
             <Grid container spacing={2} mb={4}>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Paper
                   sx={{
                     p: 2,
@@ -1523,7 +1596,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                     textAlign: "center",
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    mb={1}
+                  >
                     Light Mode
                   </Typography>
                   <Box
@@ -1546,7 +1624,7 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                   </Box>
                 </Paper>
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Paper
                   sx={{
                     p: 2,
@@ -1555,7 +1633,12 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
                     textAlign: "center",
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    mb={1}
+                  >
                     Dark Mode
                   </Typography>
                   <Box
@@ -1600,10 +1683,10 @@ const BoardSettingsDialog: React.FC<BoardSettingsDialogProps> = ({
       <DialogActions
         sx={{
           p: 4,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.03)} 0%, ${alpha(
-            theme.palette.secondary.main,
+          background: `linear-gradient(135deg, ${alpha(
+            theme.palette.primary.main,
             0.03
-          )} 100%)`,
+          )} 0%, ${alpha(theme.palette.secondary.main, 0.03)} 100%)`,
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >

@@ -2,6 +2,8 @@
 // TYPES AND CONSTANTS
 // ============================================================================
 
+import type { BoardType } from '../../../types/kanban';
+
 // types.ts
 export interface ColumnData {
   name: string;
@@ -20,7 +22,7 @@ export interface FormData {
   name: string;
   description: string;
   isDefault: boolean;
-  type: string;
+  type: BoardType;
 }
 
 export interface BoardTemplate {
