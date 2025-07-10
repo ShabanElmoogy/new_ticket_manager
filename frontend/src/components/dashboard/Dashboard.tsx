@@ -26,7 +26,7 @@ import {
 } from "../../services/api";
 import Header from "./Header";
 import StatsCards from "./StatsCards";
-import CreateTicketPost from "../tickets/CreateTicketPost";
+import CreateTicketPost from "../tickets/createTicketPost/CreateTicketPost";
 import TicketFeed from "../tickets/TicketFeed";
 import TicketDetailsDialog from "../tickets/TicketDetailsDialog";
 import ActivityFeed from "./ActivityFeed";

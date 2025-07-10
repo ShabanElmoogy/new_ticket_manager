@@ -118,6 +118,7 @@ export interface CreateTicketData {
   boardId?: string;
   dueDate?: string;
   estimatedHours?: number;
+  labelIds?: string[];
 }
 
 export interface CreateCustomerData {
