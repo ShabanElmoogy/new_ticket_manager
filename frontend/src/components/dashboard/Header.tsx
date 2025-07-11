@@ -1,10 +1,10 @@
 // components/Header.tsx - Main Header Component
 import React, { useState } from "react";
 import { AppBar, Toolbar, Box, useTheme, useMediaQuery } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 import { useThemeStore } from "../../stores/themeStore";
 import { apiService } from "../../services/api";
-import { type HeaderProps } from "../../types/header";
 import { useNotifications } from "../../hooks/useNotifications";
 import { createMenuItems } from "../../config/menuItems";
 import { formatNotificationTime } from "../../utils/notificationUtils";
@@ -21,16 +21,17 @@ import NotificationPopover from "./header/NotificationPopover";
 import PWAInstallButton from "../pwa/PWAInstallButton";
 import LanguageSwitcher from "../common/LanguageSwitcher";
 
-const Header: React.FC<HeaderProps> = ({
-  onOpenAdminPanel,
-  onOpenKanban,
-  onTicketClick,
-  onNavigateHome, // Add this prop
-}) => {
+interface HeaderProps {
+  onTicketClick?: (ticket: any) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
   const { user, logout, token } = useAuthStore();
   const { mode, toggleTheme } = useThemeStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Menu states
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -103,9 +104,22 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  // Navigation handlers using React Router
+  const handleOpenAdminPanel = () => {
+    navigate('/admin');
+    handleClose();
+    handleMobileMenuClose();
+  };
+
+  const handleOpenKanban = () => {
+    navigate('/kanban');
+    handleClose();
+    handleMobileMenuClose();
+  };
+
   const handleUserInfoClick = () => {
-    if (user?.role === "ADMIN" && onOpenAdminPanel) {
-      onOpenAdminPanel();
+    if (user?.role === "ADMIN") {
+      handleOpenAdminPanel();
     }
   };
 
@@ -118,20 +132,16 @@ const Header: React.FC<HeaderProps> = ({
     handleMobileMenuClose();
     handleNotificationClose();
 
-    // Call the navigation handler passed from Dashboard
-    if (onNavigateHome) {
-      onNavigateHome();
-    } else {
-      console.warn("onNavigateHome handler not provided to Header");
-    }
+    // Navigate to dashboard
+    navigate('/dashboard');
   };
 
   // Create menu items
   const menuItems = createMenuItems({
     user: user!,
     mode,
-    onOpenAdminPanel,
-    onOpenKanban,
+    onOpenAdminPanel: handleOpenAdminPanel,
+    onOpenKanban: handleOpenKanban,
     onToggleTheme: toggleTheme,
     onLogout: logout,
     onClose: handleClose,

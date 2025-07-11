@@ -24,33 +24,21 @@ import {
   type Customer,
   type Application,
 } from "../../services/api";
-import Header from "./Header";
 import StatsCards from "./StatsCards";
 import CreateTicketPost from "../tickets/createTicketPost/CreateTicketPost";
 import TicketFeed from "../tickets/TicketFeed";
 import TicketDetailsDialog from "../tickets/TicketDetailsDialog";
 import ActivityFeed from "./ActivityFeed";
-import AdminPanel from "../admin/AdminPanel";
 import MobileFilters from "./MobileFilters";
 import MobileTicketActions from "../tickets/MobileTicketActions";
 import ScrollToTop from "../common/ScrollToTop";
 import MobileSearchOverlay from "../tickets/MobileSearchOverlay";
-import KanbanPage from "../kanban/KanbanPage";
-import ErrorBoundary from "../common/ErrorBoundary";
 import { io, Socket } from "socket.io-client";
-
-type ViewType =
-  | "dashboard"
-  | "kanban"
-  | "admin"
-  | "whatsapp"
-  | "whatsapp-users";
 
 const Dashboard: React.FC = () => {
   const { user, token } = useAuthStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("xl"));
-  const [currentView, setCurrentView] = useState<ViewType>("dashboard");
   const [stats, setStats] = useState<DashboardStats>({
     totalTickets: 0,
     openTickets: 0,
@@ -417,34 +405,7 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const handleNavigateHome = () => {
-    // Set current view to dashboard (same as your existing pattern)
-    setCurrentView("dashboard");
-
-    // Optional: Scroll to top when going home for better UX
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  // Render different views based on currentView
-  const renderCurrentView = () => {
-    switch (currentView) {
-      case "kanban":
-        return (
-          <ErrorBoundary>
-            <KanbanPage />
-          </ErrorBoundary>
-        );
-      case "admin":
-        return (
-          <AdminPanel onBackToDashboard={() => setCurrentView("dashboard")} />
-        );
-      case "dashboard":
-      default:
-        return renderDashboardContent();
-    }
-  };
-
-  const renderDashboardContent = () => (
+  return (
     <Box>
       <Box
         sx={{
@@ -904,18 +865,6 @@ const Dashboard: React.FC = () => {
 
       {/* Desktop ScrollToTop Button */}
       {!isMobile && <ScrollToTop threshold={200} showProgress={true} />}
-    </Box>
-  );
-
-  return (
-    <Box>
-      <Header
-        onOpenAdminPanel={() => setCurrentView("admin")}
-        onOpenKanban={() => setCurrentView("kanban")}
-        onTicketClick={handleTicketClick}
-        onNavigateHome={handleNavigateHome}
-      />
-      {renderCurrentView()}
     </Box>
   );
 };

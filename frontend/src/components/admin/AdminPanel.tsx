@@ -25,22 +25,20 @@ import {
   Menu as MenuIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 import CustomersManagement from "./CustomersManagement";
 import ApplicationsManagement from "./ApplicationsManagement";
 import TicketsManagement from "./TicketsManagement";
 import TasksManagement from "./TasksManagement";
 import UserManagement from "./UserManagement";
-import AdminDashboard from "./AdminDashboard";
+import AdminDashboard from "./adminDashboard/AdminDashboard";
 
 const drawerWidth = 240;
 
-interface AdminPanelProps {
-  onBackToDashboard: () => void;
-}
-
-const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToDashboard }) => {
+const AdminPanel: React.FC = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -48,6 +46,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToDashboard }) => {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleBackToDashboard = () => {
+    navigate('/dashboard');
   };
 
   const menuItems = [
@@ -126,7 +128,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToDashboard }) => {
           </IconButton>
           <IconButton
             color="inherit"
-            onClick={onBackToDashboard}
+            onClick={handleBackToDashboard}
             sx={{ mr: 2 }}
           >
             <ArrowBackIcon />

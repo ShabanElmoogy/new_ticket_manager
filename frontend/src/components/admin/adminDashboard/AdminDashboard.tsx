@@ -14,22 +14,11 @@ import {
   ConfirmationNumber as TicketIcon,
   TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
-import { useAuthStore } from "../../stores/authStore";
-import {
-  apiService,
-  type Customer,
-  type Application,
-  type Ticket,
-} from "../../services/api";
+import { useAuthStore } from "../../../stores/authStore";
+import { apiService } from "../../../services/api";
+import DashboardCard from "../../common/DashboardCard";
+import Header from "./Header";
 
-interface StatCardProps {
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  color: string;
-}
-
-//TODO: Add i18n
 //TODO: Refactor Grid
 //TODO:Add Chat
 //TODO:Add Report
@@ -38,42 +27,6 @@ interface StatCardProps {
 //TODO: use TypeScript in backend
 //TODO:Seperate and refactor
 //TODO:FileManagement
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
-  <Card sx={{ height: "100%" }}>
-    <CardContent>
-      <Box
-        sx={{
-          display: "flex",
-          aligns: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Box>
-          <Typography color="textSecondary" gutterBottom variant="overline">
-            {title}
-          </Typography>
-          <Typography variant="h4" component="div">
-            {value}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            backgroundColor: color,
-            borderRadius: "50%",
-            p: 1,
-            display: "flex",
-            aligns: "center",
-            justifyContent: "center",
-          }}
-        >
-          {React.cloneElement(icon as React.ReactElement, {
-            sx: { color: "white", fontSize: 24 },
-          })}
-        </Box>
-      </Box>
-    </CardContent>
-  </Card>
-);
 
 const AdminDashboard: React.FC = () => {
   const { token } = useAuthStore();
@@ -139,7 +92,7 @@ const AdminDashboard: React.FC = () => {
       <Box
         display="flex"
         justifyContent="center"
-        aligns="center"
+        alignItems="center"
         minHeight="400px"
       >
         <CircularProgress />
@@ -157,22 +110,20 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Admin Dashboard
-      </Typography>
+      <Header />
 
       <Grid container spacing={3}>
         {/* Customer Stats */}
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Total Customers"
             value={stats.totalCustomers}
             icon={<PeopleIcon />}
             color="#1976d2"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Active Customers"
             value={stats.activeCustomers}
             icon={<PeopleIcon />}
@@ -181,8 +132,8 @@ const AdminDashboard: React.FC = () => {
         </Grid>
 
         {/* Application Stats */}
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Total Applications"
             value={stats.totalApplications}
             icon={<AppsIcon />}
@@ -190,8 +141,8 @@ const AdminDashboard: React.FC = () => {
           />
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Active Applications"
             value={stats.activeApplications}
             icon={<AppsIcon />}
@@ -200,32 +151,32 @@ const AdminDashboard: React.FC = () => {
         </Grid>
 
         {/* Ticket Stats */}
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Total Tickets"
             value={stats.totalTickets}
             icon={<TicketIcon />}
             color="#f57c00"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Open Tickets"
             value={stats.openTickets}
             icon={<TicketIcon />}
             color="#d32f2f"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="In Progress"
             value={stats.inProgressTickets}
             icon={<TrendingUpIcon />}
             color="#f9a825"
           />
         </Grid>
-        <Grid xs={12} sm={6} md={3}>
-          <StatCard
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <DashboardCard
             title="Resolved"
             value={stats.resolvedTickets}
             icon={<TicketIcon />}
@@ -236,7 +187,7 @@ const AdminDashboard: React.FC = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -259,7 +210,7 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -282,7 +233,7 @@ const AdminDashboard: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
