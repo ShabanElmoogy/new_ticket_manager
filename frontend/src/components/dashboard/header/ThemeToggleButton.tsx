@@ -35,7 +35,6 @@ const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({
               : "rgba(255, 255, 255, 0.1)",
         },
         border: mode === "dark" ? "1px solid rgba(255, 255, 255, 0.1)" : "none",
-        mr: 1,
       }}
       title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}
     >

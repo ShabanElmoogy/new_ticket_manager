@@ -1,28 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Avatar,
-  IconButton,
-  Badge,
-  Chip,
-  useTheme,
-  alpha,
-  Breadcrumbs,
-  Link,
-  Divider,
-} from "@mui/material";
-import {
-  Notifications,
-  Settings,
-  Dashboard,
-  Person,
-  Search,
-  Menu,
-  NavigateNext,
-  WbSunny,
-  DarkMode,
-} from "@mui/icons-material";
+import { Box, Typography, Chip, useTheme, alpha } from "@mui/material";
 
 interface HeaderProps {
   title?: string;
@@ -42,13 +19,6 @@ const Header: React.FC<HeaderProps> = ({
   title = "Admin Dashboard",
   subtitle = "Welcome back! Here's what's happening today.",
   userName = "John Doe",
-  userAvatar,
-  showBreadcrumbs = true,
-  notificationCount = 3,
-  isDarkMode = false,
-  onThemeToggle,
-  onMenuClick,
-  showUserMenu = true,
 }) => {
   const theme = useTheme();
 
@@ -71,6 +41,8 @@ const Header: React.FC<HeaderProps> = ({
         top: 0,
         zIndex: theme.zIndex.appBar,
         mb: 3,
+        borderRadius: 3,
+        border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
       }}
     >
       {/* Main Header */}
@@ -80,22 +52,10 @@ const Header: React.FC<HeaderProps> = ({
           alignItems: "center",
           justifyContent: "space-between",
           p: { xs: 2, sm: 3, md: 4 },
-          pb: showBreadcrumbs ? 2 : undefined,
         }}
       >
         {/* Left Section - Title and Greeting */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, flex: 1 }}>
-          {/* Mobile Menu Button */}
-          <IconButton
-            onClick={onMenuClick}
-            sx={{
-              display: { xs: "flex", md: "none" },
-              color: theme.palette.text.primary,
-            }}
-          >
-            <Menu />
-          </IconButton>
-
           <Box>
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 2, mb: 0.5 }}

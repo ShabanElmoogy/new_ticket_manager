@@ -106,13 +106,13 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
 
   // Navigation handlers using React Router
   const handleOpenAdminPanel = () => {
-    navigate('/admin');
+    navigate("/admin");
     handleClose();
     handleMobileMenuClose();
   };
 
   const handleOpenKanban = () => {
-    navigate('/kanban');
+    navigate("/kanban");
     handleClose();
     handleMobileMenuClose();
   };
@@ -133,7 +133,7 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
     handleNotificationClose();
 
     // Navigate to dashboard
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   // Create menu items
@@ -187,6 +187,9 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
             isMobile={isMobile}
           />
 
+          {/* Language Switcher - Desktop only, positioned after theme toggle */}
+          {!isMobile && <LanguageSwitcher variant="button" size="small" />}
+
           {/* Notification Bell */}
           <NotificationBell
             unreadCount={unreadCount}
@@ -207,9 +210,6 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
           {!isMobile && (
             <ThemeToggleButton mode={mode} onToggle={toggleTheme} />
           )}
-
-          {/* Language Switcher - Desktop only, positioned after theme toggle */}
-          {!isMobile && <LanguageSwitcher variant="button" size="small" />}
 
           {/* Menu Button */}
           <MenuButton

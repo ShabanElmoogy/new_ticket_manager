@@ -69,13 +69,12 @@ const Dashboard: React.FC = () => {
   const [isInitializing, setIsInitializing] = useState(false);
 
   const fetchInitialData = async () => {
-    
     if (!token || isInitializing) return;
 
     try {
       setIsInitializing(true);
       setLoading(true);
-      
+
       const [
         ticketsData,
         employeesData,
@@ -246,7 +245,6 @@ const Dashboard: React.FC = () => {
 
   // Initial load
   useEffect(() => {
-    
     fetchInitialData();
   }, [token]);
 
@@ -410,7 +408,7 @@ const Dashboard: React.FC = () => {
       <Box
         sx={{
           p: { xs: 1, sm: 2, md: 3 },
-          pt: { xs: 2, md: 4 },
+          pt: 0,
         }}
       >
         {/* Main Content with Sidebar Layout */}

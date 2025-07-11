@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
   CircularProgress,
   Alert,
 } from "@mui/material";
-import {
-  People as PeopleIcon,
-  Apps as AppsIcon,
-  ConfirmationNumber as TicketIcon,
-  TrendingUp as TrendingUpIcon,
-} from "@mui/icons-material";
 import { useAuthStore } from "../../../stores/authStore";
 import { apiService } from "../../../services/api";
-import DashboardCard from "../../common/DashboardCard";
 import Header from "./Header";
+import DashboardCards from "./DashboardCards";
 
 //TODO: Refactor Grid
 //TODO:Add Chat
@@ -111,151 +101,7 @@ const AdminDashboard: React.FC = () => {
   return (
     <Box>
       <Header />
-
-      <Grid container spacing={3}>
-        {/* Customer Stats */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Total Customers"
-            value={stats.totalCustomers}
-            icon={<PeopleIcon />}
-            color="#1976d2"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Active Customers"
-            value={stats.activeCustomers}
-            icon={<PeopleIcon />}
-            color="#2e7d32"
-          />
-        </Grid>
-
-        {/* Application Stats */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Total Applications"
-            value={stats.totalApplications}
-            icon={<AppsIcon />}
-            color="#7b1fa2"
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Active Applications"
-            value={stats.activeApplications}
-            icon={<AppsIcon />}
-            color="#388e3c"
-          />
-        </Grid>
-
-        {/* Ticket Stats */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Total Tickets"
-            value={stats.totalTickets}
-            icon={<TicketIcon />}
-            color="#f57c00"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Open Tickets"
-            value={stats.openTickets}
-            icon={<TicketIcon />}
-            color="#d32f2f"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="In Progress"
-            value={stats.inProgressTickets}
-            icon={<TrendingUpIcon />}
-            color="#f9a825"
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <DashboardCard
-            title="Resolved"
-            value={stats.resolvedTickets}
-            icon={<TicketIcon />}
-            color="#388e3c"
-          />
-        </Grid>
-      </Grid>
-
-      {/* Summary Cards */}
-      <Grid container spacing={3} sx={{ mt: 2 }}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Customer Overview
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                You have {stats.totalCustomers} customers in total, with{" "}
-                {stats.activeCustomers} currently active.
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Active Rate:{" "}
-                {stats.totalCustomers > 0
-                  ? Math.round(
-                      (stats.activeCustomers / stats.totalCustomers) * 100
-                    )
-                  : 0}
-                %
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Application Overview
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                You have {stats.totalApplications} applications in total, with{" "}
-                {stats.activeApplications} currently active.
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Active Rate:{" "}
-                {stats.totalApplications > 0
-                  ? Math.round(
-                      (stats.activeApplications / stats.totalApplications) * 100
-                    )
-                  : 0}
-                %
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Ticket Overview
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                You have {stats.totalTickets} tickets in total.{" "}
-                {stats.openTickets} are open and need attention.
-              </Typography>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Resolution Rate:{" "}
-                {stats.totalTickets > 0
-                  ? Math.round(
-                      (stats.resolvedTickets / stats.totalTickets) * 100
-                    )
-                  : 0}
-                %
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      <DashboardCards stats={stats} />
     </Box>
   );
 };
