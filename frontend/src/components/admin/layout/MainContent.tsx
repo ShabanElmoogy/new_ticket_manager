@@ -34,7 +34,6 @@ const MainContent: React.FC<MainContentProps> = ({
 
   return (
     <Box
-      component="main"
       sx={{
         flexGrow: 1,
         p: 3,
