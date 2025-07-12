@@ -11,6 +11,9 @@ import DashboardCards from "./DashboardCards";
 import DashboardCharts from "./DashboardCharts";
 import EnhancedDashboardCharts from "./EnhancedDashboardCharts";
 import ComprehensiveChartsLibrary from "./ComprehensiveChartsLibrary";
+import PerformanceMetrics from "./PerformanceMetrics";
+import SystemHealth from "./SystemHealth";
+import TeamOverview from "./TeamOverview";
 
 //TODO: Refactor Grid
 //TODO:Add Chat
@@ -105,6 +108,17 @@ const AdminDashboard: React.FC = () => {
     <Box>
       <Header />
       <DashboardCards stats={stats} />
+      
+      {/* Performance Analytics Section */}
+      <PerformanceMetrics />
+      
+      {/* Team Management Section */}
+      <TeamOverview />
+      
+      {/* System Monitoring Section */}
+      <SystemHealth />
+      
+      {/* Comprehensive Charts Library */}
       <ComprehensiveChartsLibrary stats={stats} />
     </Box>
   );

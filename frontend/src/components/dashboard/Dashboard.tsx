@@ -33,6 +33,8 @@ import MobileFilters from "./MobileFilters";
 import MobileTicketActions from "../tickets/MobileTicketActions";
 import ScrollToTop from "../common/ScrollToTop";
 import MobileSearchOverlay from "../tickets/MobileSearchOverlay";
+import QuickActions from "./QuickActions";
+import RecentTickets from "./RecentTickets";
 import { io, Socket } from "socket.io-client";
 
 const Dashboard: React.FC = () => {
@@ -454,6 +456,29 @@ const Dashboard: React.FC = () => {
                 }}
               />
 
+              {/* Quick Actions */}
+              <QuickActions
+                onCreateTicket={() => {
+                  const createElement = document.querySelector(
+                    '[data-testid="create-ticket"]'
+                  );
+                  if (createElement) {
+                    createElement.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                onOpenFilters={() => {
+                  const filtersElement = document.querySelector(
+                    '[data-testid="mobile-filters"]'
+                  );
+                  if (filtersElement) {
+                    filtersElement.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                onOpenSearch={() => setShowMobileSearch(true)}
+                onRefresh={fetchData}
+                pendingNotifications={0}
+              />
+
               {/* Create Ticket Post */}
               {user?.role === "ADMIN" && (
                 <div data-testid="create-ticket">
@@ -785,7 +810,7 @@ const Dashboard: React.FC = () => {
             </Container>
           </Box>
 
-          {/* Activity Feed - Hidden on mobile */}
+          {/* Sidebar - Hidden on mobile */}
           <Box
             sx={{
               flexShrink: 0,
@@ -797,6 +822,7 @@ const Dashboard: React.FC = () => {
             }}
           >
             <ActivityFeed onTicketClick={handleTicketClick} />
+            <RecentTickets onTicketClick={handleTicketClick} limit={8} />
           </Box>
         </Box>
       </Box>
