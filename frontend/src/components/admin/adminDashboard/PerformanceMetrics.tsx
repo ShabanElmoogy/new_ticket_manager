@@ -9,7 +9,6 @@ import {
   LinearProgress,
   Chip,
   useTheme,
-  Tooltip,
   IconButton,
   Collapse,
 } from "@mui/material";
@@ -52,7 +51,8 @@ interface PriorityDistribution {
 const PerformanceMetrics: React.FC = () => {
   const { user, token } = useAuthStore();
   const theme = useTheme();
-  const [performanceData, setPerformanceData] = useState<PerformanceData | null>(null);
+  const [performanceData, setPerformanceData] =
+    useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(true);
 
@@ -81,71 +81,89 @@ const PerformanceMetrics: React.FC = () => {
     }
   };
 
-  const calculatePerformanceMetrics = (tickets: Ticket[], users: User[]): PerformanceData => {
+  const calculatePerformanceMetrics = (
+    tickets: Ticket[],
+    users: User[]
+  ): PerformanceData => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     // Calculate resolution times
-    const resolvedTickets = tickets.filter(t => t.status === "RESOLVED");
-    const avgResolutionTime = resolvedTickets.length > 0
-      ? resolvedTickets.reduce((sum, ticket) => {
-          const created = new Date(ticket.createdAt);
-          const updated = new Date(ticket.updatedAt);
-          return sum + (updated.getTime() - created.getTime());
-        }, 0) / resolvedTickets.length / (1000 * 60 * 60) // Convert to hours
-      : 0;
+    const resolvedTickets = tickets.filter((t) => t.status === "RESOLVED");
+    const avgResolutionTime =
+      resolvedTickets.length > 0
+        ? resolvedTickets.reduce((sum, ticket) => {
+            const created = new Date(ticket.createdAt);
+            const updated = new Date(ticket.updatedAt);
+            return sum + (updated.getTime() - created.getTime());
+          }, 0) /
+          resolvedTickets.length /
+          (1000 * 60 * 60) // Convert to hours
+        : 0;
 
     // Tickets resolved today and this week
-    const ticketsResolvedToday = resolvedTickets.filter(t => 
-      new Date(t.updatedAt) >= today
+    const ticketsResolvedToday = resolvedTickets.filter(
+      (t) => new Date(t.updatedAt) >= today
     ).length;
 
-    const ticketsResolvedThisWeek = resolvedTickets.filter(t => 
-      new Date(t.updatedAt) >= weekAgo
+    const ticketsResolvedThisWeek = resolvedTickets.filter(
+      (t) => new Date(t.updatedAt) >= weekAgo
     ).length;
 
     // Overdue tickets (assuming 48 hours for high priority, 72 for medium, 120 for low)
-    const overdueTickets = tickets.filter(t => {
+    const overdueTickets = tickets.filter((t) => {
       if (t.status === "RESOLVED" || t.status === "CLOSED") return false;
-      
+
       const created = new Date(t.createdAt);
-      const hoursElapsed = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
-      
+      const hoursElapsed =
+        (now.getTime() - created.getTime()) / (1000 * 60 * 60);
+
       switch (t.priority) {
-        case "URGENT": return hoursElapsed > 24;
-        case "HIGH": return hoursElapsed > 48;
-        case "MEDIUM": return hoursElapsed > 72;
-        case "LOW": return hoursElapsed > 120;
-        default: return false;
+        case "URGENT":
+          return hoursElapsed > 24;
+        case "HIGH":
+          return hoursElapsed > 48;
+        case "MEDIUM":
+          return hoursElapsed > 72;
+        case "LOW":
+          return hoursElapsed > 120;
+        default:
+          return false;
       }
     }).length;
 
     // User performance
-    const userPerformance: UserPerformance[] = users.map(user => {
-      const userTickets = tickets.filter(t => t.assignedToId === user.id);
-      const userResolved = userTickets.filter(t => t.status === "RESOLVED");
-      
-      const userAvgResolution = userResolved.length > 0
-        ? userResolved.reduce((sum, ticket) => {
-            const created = new Date(ticket.createdAt);
-            const updated = new Date(ticket.updatedAt);
-            return sum + (updated.getTime() - created.getTime());
-          }, 0) / userResolved.length / (1000 * 60 * 60)
-        : 0;
+    const userPerformance: UserPerformance[] = users
+      .map((user) => {
+        const userTickets = tickets.filter((t) => t.assignedToId === user.id);
+        const userResolved = userTickets.filter((t) => t.status === "RESOLVED");
 
-      const efficiency = userTickets.length > 0 
-        ? (userResolved.length / userTickets.length) * 100 
-        : 0;
+        const userAvgResolution =
+          userResolved.length > 0
+            ? userResolved.reduce((sum, ticket) => {
+                const created = new Date(ticket.createdAt);
+                const updated = new Date(ticket.updatedAt);
+                return sum + (updated.getTime() - created.getTime());
+              }, 0) /
+              userResolved.length /
+              (1000 * 60 * 60)
+            : 0;
 
-      return {
-        user,
-        assignedTickets: userTickets.length,
-        resolvedTickets: userResolved.length,
-        avgResolutionTime: userAvgResolution,
-        efficiency,
-      };
-    }).filter(up => up.assignedTickets > 0);
+        const efficiency =
+          userTickets.length > 0
+            ? (userResolved.length / userTickets.length) * 100
+            : 0;
+
+        return {
+          user,
+          assignedTickets: userTickets.length,
+          resolvedTickets: userResolved.length,
+          avgResolutionTime: userAvgResolution,
+          efficiency,
+        };
+      })
+      .filter((up) => up.assignedTickets > 0);
 
     // Priority distribution
     const priorityCounts = tickets.reduce((acc, ticket) => {
@@ -153,7 +171,9 @@ const PerformanceMetrics: React.FC = () => {
       return acc;
     }, {} as Record<string, number>);
 
-    const priorityDistribution: PriorityDistribution[] = Object.entries(priorityCounts).map(([priority, count]) => ({
+    const priorityDistribution: PriorityDistribution[] = Object.entries(
+      priorityCounts
+    ).map(([priority, count]) => ({
       priority,
       count,
       percentage: (count / tickets.length) * 100,
@@ -172,11 +192,16 @@ const PerformanceMetrics: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "URGENT": return "#ef4444";
-      case "HIGH": return "#f97316";
-      case "MEDIUM": return "#eab308";
-      case "LOW": return "#22c55e";
-      default: return "#6b7280";
+      case "URGENT":
+        return "#ef4444";
+      case "HIGH":
+        return "#f97316";
+      case "MEDIUM":
+        return "#eab308";
+      case "LOW":
+        return "#22c55e";
+      default:
+        return "#6b7280";
     }
   };
 
@@ -232,7 +257,7 @@ const PerformanceMetrics: React.FC = () => {
         <Box sx={{ p: 3 }}>
           {/* Key Metrics */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card sx={{ height: "100%", borderRadius: 2 }}>
                 <CardContent>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -241,14 +266,17 @@ const PerformanceMetrics: React.FC = () => {
                       Avg Resolution Time
                     </Typography>
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 600, color: "#3b82f6" }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 600, color: "#3b82f6" }}
+                  >
                     {formatTime(performanceData.avgResolutionTime)}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card sx={{ height: "100%", borderRadius: 2 }}>
                 <CardContent>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -257,14 +285,17 @@ const PerformanceMetrics: React.FC = () => {
                       Resolved Today
                     </Typography>
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 600, color: "#10b981" }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 600, color: "#10b981" }}
+                  >
                     {performanceData.ticketsResolvedToday}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card sx={{ height: "100%", borderRadius: 2 }}>
                 <CardContent>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -273,14 +304,17 @@ const PerformanceMetrics: React.FC = () => {
                       Resolved This Week
                     </Typography>
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 600, color: "#8b5cf6" }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 600, color: "#8b5cf6" }}
+                  >
                     {performanceData.ticketsResolvedThisWeek}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card sx={{ height: "100%", borderRadius: 2 }}>
                 <CardContent>
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -289,7 +323,10 @@ const PerformanceMetrics: React.FC = () => {
                       Overdue Tickets
                     </Typography>
                   </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 600, color: "#ef4444" }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 600, color: "#ef4444" }}
+                  >
                     {performanceData.overdueTickets}
                   </Typography>
                 </CardContent>
@@ -305,9 +342,14 @@ const PerformanceMetrics: React.FC = () => {
               </Typography>
               <Grid container spacing={2}>
                 {performanceData.priorityDistribution.map((item) => (
-                  <Grid item xs={12} sm={6} md={3} key={item.priority}>
+                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={item.priority}>
                     <Box>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
                         <Chip
                           label={item.priority}
                           size="small"
@@ -349,7 +391,7 @@ const PerformanceMetrics: React.FC = () => {
               </Typography>
               <Grid container spacing={2}>
                 {performanceData.userPerformance.map((userPerf) => (
-                  <Grid item xs={12} sm={6} md={4} key={userPerf.user.id}>
+                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={userPerf.user.id}>
                     <Box
                       sx={{
                         p: 2,
@@ -365,7 +407,10 @@ const PerformanceMetrics: React.FC = () => {
                             width: 32,
                             height: 32,
                             borderRadius: "50%",
-                            backgroundColor: userPerf.user.role === "ADMIN" ? "#ef4444" : "#10b981",
+                            backgroundColor:
+                              userPerf.user.role === "ADMIN"
+                                ? "#ef4444"
+                                : "#10b981",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -377,7 +422,10 @@ const PerformanceMetrics: React.FC = () => {
                           {userPerf.user.name.charAt(0)}
                         </Box>
                         <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
                             {userPerf.user.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
@@ -387,11 +435,18 @@ const PerformanceMetrics: React.FC = () => {
                       </Box>
 
                       <Box mb={1}>
-                        <Box display="flex" justifyContent="space-between" mb={0.5}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          mb={0.5}
+                        >
                           <Typography variant="caption" color="text.secondary">
                             Efficiency
                           </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 600 }}
+                          >
                             {Math.round(userPerf.efficiency)}%
                           </Typography>
                         </Box>
@@ -403,8 +458,12 @@ const PerformanceMetrics: React.FC = () => {
                             borderRadius: 3,
                             backgroundColor: "rgba(0,0,0,0.1)",
                             "& .MuiLinearProgress-bar": {
-                              backgroundColor: userPerf.efficiency > 75 ? "#10b981" : 
-                                             userPerf.efficiency > 50 ? "#eab308" : "#ef4444",
+                              backgroundColor:
+                                userPerf.efficiency > 75
+                                  ? "#10b981"
+                                  : userPerf.efficiency > 50
+                                  ? "#eab308"
+                                  : "#ef4444",
                               borderRadius: 3,
                             },
                           }}
