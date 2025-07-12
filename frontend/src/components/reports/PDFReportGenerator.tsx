@@ -1,0 +1,209 @@
+// Simple PDF generation using jsPDF (fallback approach)
+import { apiService, type User, type Ticket } from "../../services/api";
+import { ReportType } from "./ReportGenerator";
+
+interface ReportData {
+  tickets: Ticket[];
+  users: User[];
+  customers: any[];
+  applications: any[];
+  stats: {
+    total: number;
+    open: number;
+    inProgress: number;
+    resolved: number;
+    closed: number;
+  };
+  dateRange: {
+    from: Date;
+    to: Date;
+  };
+}
+
+interface GenerateReportParams {
+  type: ReportType;
+  dateFrom: Date;
+  dateTo: Date;
+  user: User;
+}
+
+// Fetch report data
+const fetchReportData = async (params: GenerateReportParams): Promise<ReportData> => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No authentication token found");
+
+  const [tickets, users, customers, applications] = await Promise.all([
+    apiService.getTickets(token, {}),
+    params.user.role === "ADMIN" ? apiService.getUsers(token) : Promise.resolve([]),
+    params.user.role === "ADMIN" ? apiService.getCustomers(token) : Promise.resolve([]),
+    params.user.role === "ADMIN" ? apiService.getApplications(token) : Promise.resolve([]),
+  ]);
+
+  // Filter tickets by date range
+  const filteredTickets = tickets.filter(ticket => {
+    const ticketDate = new Date(ticket.createdAt);
+    return ticketDate >= params.dateFrom && ticketDate <= params.dateTo;
+  });
+
+  // Calculate stats
+  const stats = {
+    total: filteredTickets.length,
+    open: filteredTickets.filter(t => t.status === "OPEN").length,
+    inProgress: filteredTickets.filter(t => t.status === "IN_PROGRESS").length,
+    resolved: filteredTickets.filter(t => t.status === "RESOLVED").length,
+    closed: filteredTickets.filter(t => t.status === "CLOSED").length,
+  };
+
+  return {
+    tickets: filteredTickets,
+    users,
+    customers,
+    applications,
+    stats,
+    dateRange: {
+      from: params.dateFrom,
+      to: params.dateTo,
+    },
+  };
+};
+
+// PDF Document Components
+const ReportHeader: React.FC<{ title: string; dateRange: { from: Date; to: Date }; user: User }> = ({
+  title,
+  dateRange,
+  user,
+}) => (
+  <View style={styles.header}>
+    <Text style={styles.title}>{title}</Text>
+    <Text style={styles.subtitle}>
+      Generated on {new Date().toLocaleDateString()} by {user.name}
+    </Text>
+    <Text style={styles.subtitle}>
+      Period: {dateRange.from.toLocaleDateString()} - {dateRange.to.toLocaleDateString()}
+    </Text>
+  </View>
+);
+
+const StatsOverview: React.FC<{ stats: ReportData["stats"] }> = ({ stats }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Overview Statistics</Text>
+    <View style={styles.statsGrid}>
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>{stats.total}</Text>
+        <Text style={styles.statLabel}>Total Tickets</Text>
+      </View>
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>{stats.open}</Text>
+        <Text style={styles.statLabel}>Open</Text>
+      </View>
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>{stats.inProgress}</Text>
+        <Text style={styles.statLabel}>In Progress</Text>
+      </View>
+      <View style={styles.statCard}>
+        <Text style={styles.statValue}>{stats.resolved}</Text>
+        <Text style={styles.statLabel}>Resolved</Text>
+      </View>
+    </View>
+  </View>
+);
+
+const TicketsTable: React.FC<{ tickets: Ticket[] }> = ({ tickets }) => (
+  <View style={styles.section}>
+    <Text style={styles.sectionTitle}>Tickets Details</Text>
+    <View style={styles.table}>
+      {/* Header */}
+      <View style={[styles.tableRow, styles.tableHeader]}>
+        <Text style={styles.tableCell}>ID</Text>
+        <Text style={styles.tableCell}>Title</Text>
+        <Text style={styles.tableCell}>Status</Text>
+        <Text style={styles.tableCell}>Priority</Text>
+        <Text style={styles.tableCell}>Created</Text>
+        <Text style={styles.tableCell}>Assigned To</Text>
+      </View>
+      
+      {/* Data Rows */}
+      {tickets.slice(0, 50).map((ticket) => (
+        <View key={ticket.id} style={styles.tableRow}>
+          <Text style={styles.tableCell}>{ticket.id.slice(0, 8)}...</Text>
+          <Text style={styles.tableCell}>{ticket.title.slice(0, 30)}...</Text>
+          <Text style={styles.tableCell}>{ticket.status}</Text>
+          <Text style={styles.tableCell}>{ticket.priority}</Text>
+          <Text style={styles.tableCell}>
+            {new Date(ticket.createdAt).toLocaleDateString()}
+          </Text>
+          <Text style={styles.tableCell}>
+            {ticket.assignedTo?.name || "Unassigned"}
+          </Text>
+        </View>
+      ))}
+    </View>
+    
+    {tickets.length > 50 && (
+      <Text style={styles.subtitle}>
+        Showing first 50 tickets of {tickets.length} total tickets
+      </Text>
+    )}
+  </View>
+);
+
+const ReportFooter: React.FC = () => (
+  <Text style={styles.footer}>
+    Generated by Ticket Management System - {new Date().toLocaleString()}
+  </Text>
+);
+
+// Main PDF Document
+const PDFDocument: React.FC<{ data: ReportData; title: string; user: User }> = ({
+  data,
+  title,
+  user,
+}) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <ReportHeader title={title} dateRange={data.dateRange} user={user} />
+      <StatsOverview stats={data.stats} />
+      <TicketsTable tickets={data.tickets} />
+      <ReportFooter />
+    </Page>
+  </Document>
+);
+
+// Report type configurations
+const getReportTitle = (type: ReportType): string => {
+  const titles: Record<ReportType, string> = {
+    "ticket-summary": "Ticket Summary Report",
+    "performance-analytics": "Performance Analytics Report",
+    "team-productivity": "Team Productivity Report",
+    "customer-report": "Customer Activity Report",
+    "sla-compliance": "SLA Compliance Report",
+    "monthly-summary": "Monthly Summary Report",
+  };
+  return titles[type];
+};
+
+// Main export function
+export const generatePDFReport = async (params: GenerateReportParams): Promise<void> => {
+  try {
+    // Fetch data
+    const data = await fetchReportData(params);
+    
+    // Get report title
+    const title = getReportTitle(params.type);
+    
+    // Generate PDF
+    const doc = <PDFDocument data={data} title={title} user={params.user} />;
+    const blob = await pdf(doc).toBlob();
+    
+    // Download file
+    const fileName = `${params.type}-report-${params.dateFrom.toISOString().split('T')[0]}-to-${params.dateTo.toISOString().split('T')[0]}.pdf`;
+    saveAs(blob, fileName);
+    
+  } catch (error) {
+    console.error("Error generating PDF report:", error);
+    throw new Error("Failed to generate PDF report");
+  }
+};
+
+// Export individual components for testing
+export { PDFDocument, ReportHeader, StatsOverview, TicketsTable };

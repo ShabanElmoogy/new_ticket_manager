@@ -14,6 +14,7 @@ import ComprehensiveChartsLibrary from "./ComprehensiveChartsLibrary";
 import PerformanceMetrics from "./PerformanceMetrics";
 import SystemHealth from "./SystemHealth";
 import TeamOverview from "./TeamOverview";
+import ReportGenerator from "../../reports/ReportGenerator";
 
 //TODO: Refactor Grid
 //TODO:Add Chat
@@ -117,6 +118,9 @@ const AdminDashboard: React.FC = () => {
       
       {/* System Monitoring Section */}
       <SystemHealth />
+      
+      {/* Report Generator Section */}
+      <ReportGenerator />
       
       {/* Comprehensive Charts Library */}
       <ComprehensiveChartsLibrary stats={stats} />
