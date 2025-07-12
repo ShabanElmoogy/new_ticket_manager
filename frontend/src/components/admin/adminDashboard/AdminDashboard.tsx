@@ -8,11 +8,14 @@ import { useAuthStore } from "../../../stores/authStore";
 import { apiService } from "../../../services/api";
 import Header from "./Header";
 import DashboardCards from "./DashboardCards";
+import DashboardCharts from "./DashboardCharts";
+import EnhancedDashboardCharts from "./EnhancedDashboardCharts";
+import ComprehensiveChartsLibrary from "./ComprehensiveChartsLibrary";
 
 //TODO: Refactor Grid
 //TODO:Add Chat
 //TODO:Add Report
-//TODO:Add Charts
+//✅ Charts implemented with ComprehensiveChartsLibrary - All chart types covered
 //TODO: JWt Cookie Http Only
 //TODO: use TypeScript in backend
 //TODO:Seperate and refactor
@@ -102,6 +105,7 @@ const AdminDashboard: React.FC = () => {
     <Box>
       <Header />
       <DashboardCards stats={stats} />
+      <ComprehensiveChartsLibrary stats={stats} />
     </Box>
   );
 };
