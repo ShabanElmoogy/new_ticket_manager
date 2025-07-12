@@ -71,7 +71,7 @@ const SystemHealth: React.FC = () => {
   const fetchSystemHealth = async () => {
     try {
       setLoading(true);
-      
+
       // Simulate system health data (in a real app, this would come from your backend)
       const mockMetrics: SystemMetric[] = [
         {
@@ -137,9 +137,9 @@ const SystemHealth: React.FC = () => {
       ];
 
       // Determine status based on thresholds
-      const updatedMetrics = mockMetrics.map(metric => {
+      const updatedMetrics = mockMetrics.map((metric) => {
         let status: "healthy" | "warning" | "critical" = "healthy";
-        
+
         if (metric.id === "uptime") {
           // For uptime, lower values are worse
           if (metric.value < metric.threshold.critical) status = "critical";
@@ -157,13 +157,15 @@ const SystemHealth: React.FC = () => {
 
       // Generate alerts based on metrics
       const newAlerts: SystemAlert[] = [];
-      updatedMetrics.forEach(metric => {
+      updatedMetrics.forEach((metric) => {
         if (metric.status === "critical") {
           newAlerts.push({
             id: `alert-${metric.id}-${Date.now()}`,
             type: "error",
             title: `Critical: ${metric.name}`,
-            message: `${metric.name} is at ${metric.value.toFixed(1)}${metric.unit}, which exceeds the critical threshold.`,
+            message: `${metric.name} is at ${metric.value.toFixed(1)}${
+              metric.unit
+            }, which exceeds the critical threshold.`,
             timestamp: new Date().toISOString(),
           });
         } else if (metric.status === "warning") {
@@ -171,7 +173,9 @@ const SystemHealth: React.FC = () => {
             id: `alert-${metric.id}-${Date.now()}`,
             type: "warning",
             title: `Warning: ${metric.name}`,
-            message: `${metric.name} is at ${metric.value.toFixed(1)}${metric.unit}, approaching critical levels.`,
+            message: `${metric.name} is at ${metric.value.toFixed(1)}${
+              metric.unit
+            }, approaching critical levels.`,
             timestamp: new Date().toISOString(),
           });
         }
@@ -198,29 +202,42 @@ const SystemHealth: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "healthy": return "#10b981";
-      case "warning": return "#f59e0b";
-      case "critical": return "#ef4444";
-      default: return "#6b7280";
+      case "healthy":
+        return "#10b981";
+      case "warning":
+        return "#f59e0b";
+      case "critical":
+        return "#ef4444";
+      default:
+        return "#6b7280";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "healthy": return <CheckCircleIcon sx={{ color: "#10b981" }} />;
-      case "warning": return <WarningIcon sx={{ color: "#f59e0b" }} />;
-      case "critical": return <ErrorIcon sx={{ color: "#ef4444" }} />;
-      default: return <InfoIcon sx={{ color: "#6b7280" }} />;
+      case "healthy":
+        return <CheckCircleIcon sx={{ color: "#10b981" }} />;
+      case "warning":
+        return <WarningIcon sx={{ color: "#f59e0b" }} />;
+      case "critical":
+        return <ErrorIcon sx={{ color: "#ef4444" }} />;
+      default:
+        return <InfoIcon sx={{ color: "#6b7280" }} />;
     }
   };
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case "success": return <CheckCircleIcon />;
-      case "warning": return <WarningIcon />;
-      case "error": return <ErrorIcon />;
-      case "info": return <InfoIcon />;
-      default: return <InfoIcon />;
+      case "success":
+        return <CheckCircleIcon />;
+      case "warning":
+        return <WarningIcon />;
+      case "error":
+        return <ErrorIcon />;
+      case "info":
+        return <InfoIcon />;
+      default:
+        return <InfoIcon />;
     }
   };
 
@@ -276,10 +293,10 @@ const SystemHealth: React.FC = () => {
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
             System Metrics
           </Typography>
-          
+
           <Grid container spacing={2} sx={{ mb: 3 }}>
             {metrics.map((metric) => (
-              <Grid item xs={12} sm={6} md={4} key={metric.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={metric.id}>
                 <Card sx={{ height: "100%", borderRadius: 2 }}>
                   <CardContent>
                     <Box display="flex" alignItems="center" gap={1} mb={1}>
@@ -293,12 +310,17 @@ const SystemHealth: React.FC = () => {
                     </Box>
 
                     <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                      {metric.value.toFixed(1)}{metric.unit}
+                      {metric.value.toFixed(1)}
+                      {metric.unit}
                     </Typography>
 
                     <LinearProgress
                       variant="determinate"
-                      value={metric.id === "uptime" ? metric.value : Math.min(metric.value, 100)}
+                      value={
+                        metric.id === "uptime"
+                          ? metric.value
+                          : Math.min(metric.value, 100)
+                      }
                       sx={{
                         height: 8,
                         borderRadius: 4,
@@ -317,10 +339,12 @@ const SystemHealth: React.FC = () => {
 
                     <Box display="flex" justifyContent="space-between" mt={1}>
                       <Typography variant="caption" color="text.disabled">
-                        Warning: {metric.threshold.warning}{metric.unit}
+                        Warning: {metric.threshold.warning}
+                        {metric.unit}
                       </Typography>
                       <Typography variant="caption" color="text.disabled">
-                        Critical: {metric.threshold.critical}{metric.unit}
+                        Critical: {metric.threshold.critical}
+                        {metric.unit}
                       </Typography>
                     </Box>
                   </CardContent>
@@ -335,7 +359,7 @@ const SystemHealth: React.FC = () => {
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 System Alerts
               </Typography>
-              
+
               <Box sx={{ maxHeight: "300px", overflow: "auto" }}>
                 {alerts.map((alert) => (
                   <Alert
@@ -362,41 +386,57 @@ const SystemHealth: React.FC = () => {
           )}
 
           {/* System Status Summary */}
-          <Box sx={{ mt: 3, p: 2, backgroundColor: "background.default", borderRadius: 2 }}>
+          <Box
+            sx={{
+              mt: 3,
+              p: 2,
+              backgroundColor: "background.default",
+              borderRadius: 2,
+            }}
+          >
             <Box display="flex" alignItems="center" gap={1} mb={1}>
               <UpdateIcon sx={{ color: "primary.main" }} />
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                 System Status Summary
               </Typography>
             </Box>
-            
+
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Box textAlign="center">
-                  <Typography variant="h3" sx={{ color: "#10b981", fontWeight: 600 }}>
-                    {metrics.filter(m => m.status === "healthy").length}
+                  <Typography
+                    variant="h3"
+                    sx={{ color: "#10b981", fontWeight: 600 }}
+                  >
+                    {metrics.filter((m) => m.status === "healthy").length}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Healthy Services
                   </Typography>
                 </Box>
               </Grid>
-              
-              <Grid item xs={12} sm={4}>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Box textAlign="center">
-                  <Typography variant="h3" sx={{ color: "#f59e0b", fontWeight: 600 }}>
-                    {metrics.filter(m => m.status === "warning").length}
+                  <Typography
+                    variant="h3"
+                    sx={{ color: "#f59e0b", fontWeight: 600 }}
+                  >
+                    {metrics.filter((m) => m.status === "warning").length}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Warning Services
                   </Typography>
                 </Box>
               </Grid>
-              
-              <Grid item xs={12} sm={4}>
+
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <Box textAlign="center">
-                  <Typography variant="h3" sx={{ color: "#ef4444", fontWeight: 600 }}>
-                    {metrics.filter(m => m.status === "critical").length}
+                  <Typography
+                    variant="h3"
+                    sx={{ color: "#ef4444", fontWeight: 600 }}
+                  >
+                    {metrics.filter((m) => m.status === "critical").length}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     Critical Services
