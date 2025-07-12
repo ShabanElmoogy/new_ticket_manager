@@ -88,70 +88,97 @@ const TeamOverview: React.FC = () => {
 
   const calculateTeamStats = (users: User[], tickets: Ticket[]) => {
     const now = new Date();
-    
-    const members: TeamMember[] = users.map(user => {
-      const userTickets = tickets.filter(t => t.assignedToId === user.id);
-      const completedTickets = userTickets.filter(t => t.status === "RESOLVED" || t.status === "CLOSED");
-      const inProgressTickets = userTickets.filter(t => t.status === "IN_PROGRESS");
-      
-      // Calculate overdue tickets (simplified logic)
-      const overdueTickets = userTickets.filter(t => {
-        if (t.status === "RESOLVED" || t.status === "CLOSED") return false;
-        
-        const created = new Date(t.createdAt);
-        const hoursElapsed = (now.getTime() - created.getTime()) / (1000 * 60 * 60);
-        
-        switch (t.priority) {
-          case "URGENT": return hoursElapsed > 24;
-          case "HIGH": return hoursElapsed > 48;
-          case "MEDIUM": return hoursElapsed > 72;
-          case "LOW": return hoursElapsed > 120;
-          default: return false;
-        }
-      });
 
-      const completionRate = userTickets.length > 0 
-        ? (completedTickets.length / userTickets.length) * 100 
-        : 0;
+    const members: TeamMember[] = users
+      .map((user) => {
+        const userTickets = tickets.filter((t) => t.assignedToId === user.id);
+        const completedTickets = userTickets.filter(
+          (t) => t.status === "RESOLVED" || t.status === "CLOSED"
+        );
+        const inProgressTickets = userTickets.filter(
+          (t) => t.status === "IN_PROGRESS"
+        );
 
-      // Calculate average resolution time
-      const avgResolutionTime = completedTickets.length > 0
-        ? completedTickets.reduce((sum, ticket) => {
-            const created = new Date(ticket.createdAt);
-            const updated = new Date(ticket.updatedAt);
-            return sum + (updated.getTime() - created.getTime());
-          }, 0) / completedTickets.length / (1000 * 60 * 60) // Convert to hours
-        : 0;
+        // Calculate overdue tickets (simplified logic)
+        const overdueTickets = userTickets.filter((t) => {
+          if (t.status === "RESOLVED" || t.status === "CLOSED") return false;
 
-      // Determine workload
-      let workload: "light" | "moderate" | "heavy" = "light";
-      if (userTickets.length > 15) workload = "heavy";
-      else if (userTickets.length > 8) workload = "moderate";
+          const created = new Date(t.createdAt);
+          const hoursElapsed =
+            (now.getTime() - created.getTime()) / (1000 * 60 * 60);
 
-      return {
-        user,
-        stats: {
-          totalAssigned: userTickets.length,
-          completed: completedTickets.length,
-          inProgress: inProgressTickets.length,
-          overdue: overdueTickets.length,
-          completionRate,
-          avgResolutionTime,
-          workload,
-        },
-      };
-    }).filter(member => member.stats.totalAssigned > 0); // Only show members with assigned tickets
+          switch (t.priority) {
+            case "URGENT":
+              return hoursElapsed > 24;
+            case "HIGH":
+              return hoursElapsed > 48;
+            case "MEDIUM":
+              return hoursElapsed > 72;
+            case "LOW":
+              return hoursElapsed > 120;
+            default:
+              return false;
+          }
+        });
+
+        const completionRate =
+          userTickets.length > 0
+            ? (completedTickets.length / userTickets.length) * 100
+            : 0;
+
+        // Calculate average resolution time
+        const avgResolutionTime =
+          completedTickets.length > 0
+            ? completedTickets.reduce((sum, ticket) => {
+                const created = new Date(ticket.createdAt);
+                const updated = new Date(ticket.updatedAt);
+                return sum + (updated.getTime() - created.getTime());
+              }, 0) /
+              completedTickets.length /
+              (1000 * 60 * 60) // Convert to hours
+            : 0;
+
+        // Determine workload
+        let workload: "light" | "moderate" | "heavy" = "light";
+        if (userTickets.length > 15) workload = "heavy";
+        else if (userTickets.length > 8) workload = "moderate";
+
+        return {
+          user,
+          stats: {
+            totalAssigned: userTickets.length,
+            completed: completedTickets.length,
+            inProgress: inProgressTickets.length,
+            overdue: overdueTickets.length,
+            completionRate,
+            avgResolutionTime,
+            workload,
+          },
+        };
+      })
+      .filter((member) => member.stats.totalAssigned > 0); // Only show members with assigned tickets
 
     // Calculate team stats
-    const totalTicketsAssigned = members.reduce((sum, member) => sum + member.stats.totalAssigned, 0);
-    const totalTicketsCompleted = members.reduce((sum, member) => sum + member.stats.completed, 0);
-    const teamCompletionRate = totalTicketsAssigned > 0 
-      ? (totalTicketsCompleted / totalTicketsAssigned) * 100 
-      : 0;
+    const totalTicketsAssigned = members.reduce(
+      (sum, member) => sum + member.stats.totalAssigned,
+      0
+    );
+    const totalTicketsCompleted = members.reduce(
+      (sum, member) => sum + member.stats.completed,
+      0
+    );
+    const teamCompletionRate =
+      totalTicketsAssigned > 0
+        ? (totalTicketsCompleted / totalTicketsAssigned) * 100
+        : 0;
 
-    const avgTeamResolutionTime = members.length > 0
-      ? members.reduce((sum, member) => sum + member.stats.avgResolutionTime, 0) / members.length
-      : 0;
+    const avgTeamResolutionTime =
+      members.length > 0
+        ? members.reduce(
+            (sum, member) => sum + member.stats.avgResolutionTime,
+            0
+          ) / members.length
+        : 0;
 
     const stats: TeamStats = {
       totalMembers: users.length,
@@ -167,19 +194,27 @@ const TeamOverview: React.FC = () => {
 
   const getWorkloadColor = (workload: string) => {
     switch (workload) {
-      case "light": return "#10b981";
-      case "moderate": return "#f59e0b";
-      case "heavy": return "#ef4444";
-      default: return "#6b7280";
+      case "light":
+        return "#10b981";
+      case "moderate":
+        return "#f59e0b";
+      case "heavy":
+        return "#ef4444";
+      default:
+        return "#6b7280";
     }
   };
 
   const getWorkloadIcon = (workload: string) => {
     switch (workload) {
-      case "light": return "🟢";
-      case "moderate": return "🟡";
-      case "heavy": return "🔴";
-      default: return "⚪";
+      case "light":
+        return "🟢";
+      case "moderate":
+        return "🟡";
+      case "heavy":
+        return "🔴";
+      default:
+        return "⚪";
     }
   };
 
@@ -190,10 +225,14 @@ const TeamOverview: React.FC = () => {
   };
 
   const getPerformanceRating = (completionRate: number) => {
-    if (completionRate >= 90) return { rating: "Excellent", stars: 5, color: "#10b981" };
-    if (completionRate >= 80) return { rating: "Good", stars: 4, color: "#22c55e" };
-    if (completionRate >= 70) return { rating: "Average", stars: 3, color: "#eab308" };
-    if (completionRate >= 60) return { rating: "Below Average", stars: 2, color: "#f97316" };
+    if (completionRate >= 90)
+      return { rating: "Excellent", stars: 5, color: "#10b981" };
+    if (completionRate >= 80)
+      return { rating: "Good", stars: 4, color: "#22c55e" };
+    if (completionRate >= 70)
+      return { rating: "Average", stars: 3, color: "#eab308" };
+    if (completionRate >= 60)
+      return { rating: "Below Average", stars: 2, color: "#f97316" };
     return { rating: "Needs Improvement", stars: 1, color: "#ef4444" };
   };
 
@@ -251,11 +290,16 @@ const TeamOverview: React.FC = () => {
           {/* Team Stats Summary */}
           {teamStats && (
             <Grid container spacing={3} sx={{ mb: 3 }}>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Card sx={{ height: "100%", borderRadius: 2 }}>
                   <CardContent sx={{ textAlign: "center" }}>
-                    <PeopleIcon sx={{ fontSize: 40, color: "#3b82f6", mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, color: "#3b82f6" }}>
+                    <PeopleIcon
+                      sx={{ fontSize: 40, color: "#3b82f6", mb: 1 }}
+                    />
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 600, color: "#3b82f6" }}
+                    >
                       {teamStats.activeMembers}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -265,11 +309,16 @@ const TeamOverview: React.FC = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Card sx={{ height: "100%", borderRadius: 2 }}>
                   <CardContent sx={{ textAlign: "center" }}>
-                    <AssignmentIcon sx={{ fontSize: 40, color: "#8b5cf6", mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, color: "#8b5cf6" }}>
+                    <AssignmentIcon
+                      sx={{ fontSize: 40, color: "#8b5cf6", mb: 1 }}
+                    />
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 600, color: "#8b5cf6" }}
+                    >
                       {teamStats.totalTicketsAssigned}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -279,11 +328,16 @@ const TeamOverview: React.FC = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Card sx={{ height: "100%", borderRadius: 2 }}>
                   <CardContent sx={{ textAlign: "center" }}>
-                    <CheckCircleIcon sx={{ fontSize: 40, color: "#10b981", mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, color: "#10b981" }}>
+                    <CheckCircleIcon
+                      sx={{ fontSize: 40, color: "#10b981", mb: 1 }}
+                    />
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 600, color: "#10b981" }}
+                    >
                       {Math.round(teamStats.teamCompletionRate)}%
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -293,11 +347,16 @@ const TeamOverview: React.FC = () => {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Card sx={{ height: "100%", borderRadius: 2 }}>
                   <CardContent sx={{ textAlign: "center" }}>
-                    <ScheduleIcon sx={{ fontSize: 40, color: "#f59e0b", mb: 1 }} />
-                    <Typography variant="h4" sx={{ fontWeight: 600, color: "#f59e0b" }}>
+                    <ScheduleIcon
+                      sx={{ fontSize: 40, color: "#f59e0b", mb: 1 }}
+                    />
+                    <Typography
+                      variant="h4"
+                      sx={{ fontWeight: 600, color: "#f59e0b" }}
+                    >
                       {formatTime(teamStats.avgTeamResolutionTime)}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
@@ -316,23 +375,32 @@ const TeamOverview: React.FC = () => {
 
           <Grid container spacing={2}>
             {teamMembers.map((member) => {
-              const performance = getPerformanceRating(member.stats.completionRate);
-              
+              const performance = getPerformanceRating(
+                member.stats.completionRate
+              );
+
               return (
-                <Grid item xs={12} sm={6} md={4} key={member.user.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={member.user.id}>
                   <Card sx={{ height: "100%", borderRadius: 2 }}>
                     <CardContent>
                       {/* Member Header */}
                       <Box display="flex" alignItems="center" gap={2} mb={2}>
                         <Badge
-                          badgeContent={member.stats.overdue > 0 ? member.stats.overdue : null}
+                          badgeContent={
+                            member.stats.overdue > 0
+                              ? member.stats.overdue
+                              : null
+                          }
                           color="error"
                         >
                           <Avatar
                             sx={{
                               width: 48,
                               height: 48,
-                              backgroundColor: member.user.role === "ADMIN" ? "#ef4444" : "#10b981",
+                              backgroundColor:
+                                member.user.role === "ADMIN"
+                                  ? "#ef4444"
+                                  : "#10b981",
                               fontSize: "1.2rem",
                               fontWeight: 600,
                             }}
@@ -340,9 +408,12 @@ const TeamOverview: React.FC = () => {
                             {member.user.name.charAt(0)}
                           </Avatar>
                         </Badge>
-                        
+
                         <Box flex={1}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                          <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: 600 }}
+                          >
                             {member.user.name}
                           </Typography>
                           <Box display="flex" alignItems="center" gap={1}>
@@ -352,18 +423,25 @@ const TeamOverview: React.FC = () => {
                               sx={{
                                 height: 20,
                                 fontSize: "0.7rem",
-                                backgroundColor: member.user.role === "ADMIN" ? "#ef4444" : "#10b981",
+                                backgroundColor:
+                                  member.user.role === "ADMIN"
+                                    ? "#ef4444"
+                                    : "#10b981",
                                 color: "white",
                                 fontWeight: 600,
                               }}
                             />
                             <Chip
-                              label={`${getWorkloadIcon(member.stats.workload)} ${member.stats.workload}`}
+                              label={`${getWorkloadIcon(
+                                member.stats.workload
+                              )} ${member.stats.workload}`}
                               size="small"
                               sx={{
                                 height: 20,
                                 fontSize: "0.7rem",
-                                backgroundColor: getWorkloadColor(member.stats.workload),
+                                backgroundColor: getWorkloadColor(
+                                  member.stats.workload
+                                ),
                                 color: "white",
                                 fontWeight: 600,
                               }}
@@ -374,7 +452,12 @@ const TeamOverview: React.FC = () => {
 
                       {/* Performance Rating */}
                       <Box mb={2}>
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={1}
+                        >
                           <Typography variant="body2" color="text.secondary">
                             Performance
                           </Typography>
@@ -384,20 +467,30 @@ const TeamOverview: React.FC = () => {
                                 key={i}
                                 sx={{
                                   fontSize: 16,
-                                  color: i < performance.stars ? performance.color : "#e5e7eb",
+                                  color:
+                                    i < performance.stars
+                                      ? performance.color
+                                      : "#e5e7eb",
                                 }}
                               />
                             ))}
                           </Box>
                         </Box>
-                        <Typography variant="caption" sx={{ color: performance.color, fontWeight: 600 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: performance.color, fontWeight: 600 }}
+                        >
                           {performance.rating}
                         </Typography>
                       </Box>
 
                       {/* Completion Rate */}
                       <Box mb={2}>
-                        <Box display="flex" justifyContent="space-between" mb={0.5}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          mb={0.5}
+                        >
                           <Typography variant="body2" color="text.secondary">
                             Completion Rate
                           </Typography>
@@ -422,45 +515,97 @@ const TeamOverview: React.FC = () => {
 
                       {/* Stats Grid */}
                       <Grid container spacing={1}>
-                        <Grid item xs={6}>
-                          <Box textAlign="center" sx={{ p: 1, backgroundColor: "background.default", borderRadius: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: "#3b82f6" }}>
+                        <Grid size={6}>
+                          <Box
+                            textAlign="center"
+                            sx={{
+                              p: 1,
+                              backgroundColor: "background.default",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, color: "#3b82f6" }}
+                            >
                               {member.stats.totalAssigned}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               Assigned
                             </Typography>
                           </Box>
                         </Grid>
-                        
-                        <Grid item xs={6}>
-                          <Box textAlign="center" sx={{ p: 1, backgroundColor: "background.default", borderRadius: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: "#10b981" }}>
+
+                        <Grid size={6}>
+                          <Box
+                            textAlign="center"
+                            sx={{
+                              p: 1,
+                              backgroundColor: "background.default",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, color: "#10b981" }}
+                            >
                               {member.stats.completed}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               Completed
                             </Typography>
                           </Box>
                         </Grid>
-                        
-                        <Grid item xs={6}>
-                          <Box textAlign="center" sx={{ p: 1, backgroundColor: "background.default", borderRadius: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: "#f59e0b" }}>
+
+                        <Grid size={6}>
+                          <Box
+                            textAlign="center"
+                            sx={{
+                              p: 1,
+                              backgroundColor: "background.default",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, color: "#f59e0b" }}
+                            >
                               {member.stats.inProgress}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               In Progress
                             </Typography>
                           </Box>
                         </Grid>
-                        
-                        <Grid item xs={6}>
-                          <Box textAlign="center" sx={{ p: 1, backgroundColor: "background.default", borderRadius: 1 }}>
-                            <Typography variant="h6" sx={{ fontWeight: 600, color: "#ef4444" }}>
+
+                        <Grid size={6}>
+                          <Box
+                            textAlign="center"
+                            sx={{
+                              p: 1,
+                              backgroundColor: "background.default",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{ fontWeight: 600, color: "#ef4444" }}
+                            >
                               {member.stats.overdue}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               Overdue
                             </Typography>
                           </Box>
@@ -470,7 +615,8 @@ const TeamOverview: React.FC = () => {
                       {/* Average Resolution Time */}
                       <Box sx={{ mt: 2, textAlign: "center" }}>
                         <Typography variant="caption" color="text.secondary">
-                          Avg Resolution: {formatTime(member.stats.avgResolutionTime)}
+                          Avg Resolution:{" "}
+                          {formatTime(member.stats.avgResolutionTime)}
                         </Typography>
                       </Box>
                     </CardContent>
